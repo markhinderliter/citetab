@@ -116,8 +116,17 @@ warn_unreachable = true
 pretty = true
 
 [[tool.mypy.overrides]]
-module = ["eyecite.*", "docx.*"]
+module = ["docx.*", "courts_db.*", "pdfplumber.*", "reporters_db.*"]
 ignore_missing_imports = true
+
+# eyecite ships py.typed but leaves model methods (``span``, ``matched_text``)
+# unannotated; skip following it so those calls are Any rather than failing
+# --strict's no-untyped-call. This is the only third-party seam we lean on for
+# behavior rather than types.
+[[tool.mypy.overrides]]
+module = ["eyecite.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

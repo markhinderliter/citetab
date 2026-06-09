@@ -52,7 +52,7 @@ class OccurrenceReference(BaseModel):
     """Verbatim occurrence text. Never altered; truncation marked with an ellipsis."""
 
     page: int | None = Field(default=None, ge=1)
-    """Page in the converged render, or ``None`` if the finding fired before one existed."""
+    """Page in the converged render, or ``None`` if the finding fired before one."""
 
 
 class ToaEntryReference(BaseModel):
@@ -71,7 +71,7 @@ class ToaEntryReference(BaseModel):
 
 
 class Evidence(BaseModel):
-    """Structured evidence supporting a finding, for auditing without leaving the report."""
+    """Structured evidence supporting a finding, for auditing within the report."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -79,10 +79,10 @@ class Evidence(BaseModel):
     """Body occurrences the finding cites. Empty for input-TOA or run-level findings."""
 
     toa_entry_references: list[ToaEntryReference] = Field(default_factory=list)
-    """Input-TOA entries the finding cites. Empty for body-only or run-level findings."""
+    """Input-TOA entries the finding cites. Empty for body-only or run-level."""
 
     computed_values: dict[str, Any] = Field(default_factory=dict)
-    """Rule-specific intermediate values (e.g. corrected_pages, passim_threshold, iterations)."""
+    """Rule-specific intermediate values (e.g. corrected_pages, passim_threshold)."""
 
 
 class Citation(BaseModel):
@@ -130,7 +130,7 @@ class Finding(BaseModel):
     """What the finding demands of the user: error, warning, or info."""
 
     confidence: Confidence
-    """Confidence in the finding's real-world claim: high, medium, or low (v1 uses high/medium)."""
+    """Confidence in the finding's claim: high, medium, or low (v1 uses high/medium)."""
 
     message: str
     """Plain-language summary: what happened, what the tool did, what to verify."""
@@ -142,13 +142,13 @@ class Finding(BaseModel):
     """Supporting authorities, copied from the rule card."""
 
     evaluated_at_utc: str
-    """ISO-8601 timestamp of when the rule was evaluated (not when the doc was authored)."""
+    """ISO-8601 timestamp of when the rule was evaluated (not when the doc was)."""
 
     engine_version: Annotated[str, Field(pattern=_SEMVER)]
     """Semantic version of the toatool engine at generation time."""
 
     subject: str | None = None
-    """Verbatim authority/entry/line the finding concerns; omitted for run-level findings."""
+    """Verbatim authority/entry/line the finding concerns; omitted for run-level."""
 
     authority_id: str | None = None
     """Registry Authority this finding maps to, when applicable."""

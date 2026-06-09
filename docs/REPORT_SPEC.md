@@ -1,7 +1,7 @@
 # Report Specification (Step D)
 
 **Status:** Draft for ratification
-**Version:** 0.1.0-draft
+**Version:** 0.1.0-draft (§5 finding-order key corrected 2026-06-09 — see §5 note)
 **Depends on:** `INPUT_OUTPUT_SPEC.md` §5 (output contract), `schemas/finding.schema.json`, the eight rule cards (`rules/toa/`), and the active court profile.
 
 This document is normative for the Markdown report toatool writes beside
@@ -76,8 +76,8 @@ in the profile's sort order. Each entry is one line:
 
 A level-2 `## Findings` heading. If there are none: the single line
 `No findings.` Otherwise, findings are ordered **error → warning → info**,
-and within a severity by first evidence location (document order), then by
-rule id. Each finding renders as:
+and within a severity by **rule id**, then by first evidence location
+(document order). Each finding renders as:
 
 ```
 ### {rule_id} · {rule name} — {severity} ({confidence})
@@ -121,6 +121,17 @@ act; `warning` = verify before filing; `info` = a disclosure or a
 correction the tool made. **TT-008 renders at `warning`** per its rule
 card; `INPUT_OUTPUT_SPEC.md` §3.1 still says "info" and is to be patched on
 next touch — the card governs.
+
+### Note — finding-order reconciliation (2026-06-09)
+
+An earlier draft of this section ordered findings within a severity by
+document order, then rule id. That conflicted with `PRD.md` §11 FR-10 and
+`rules/README.md` ("Cross-rule concerns"), both of which specify **rule id,
+then document order**. The two PRD/rule-pack sources govern: this section
+was corrected to **severity → rule id → document order** so all three
+agree. The change affects only the tie-break between two findings of the
+same severity, and none of the committed `examples/reports/` instances
+contain two same-severity findings, so they are unaffected.
 
 ## 6. Determinism
 

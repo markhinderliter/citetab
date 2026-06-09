@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+src/toatool/_bundled/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test / coverage / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# toatool run artifacts (regenerated outputs of a run, never committed)
+*.toa.docx
+*.toa-report.md
+*.toa-report.json
+
+# ...but the committed example reports are tracked deliberately.
+!examples/reports/*.toa-report.md

@@ -1,0 +1,36 @@
+name: ci
+
+# The single quality gate: CI runs exactly what a contributor runs locally
+# (scripts/check.sh = ruff + ruff format --check + mypy --strict + pytest/coverage).
+# LibreOffice is installed so the render-backed integration tests actually
+# exercise rather than skip.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install LibreOffice (system dependency for page measurement)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreoffice fontconfig
+
+      - name: Install toatool with dev extras
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run quality gates
+        run: ./scripts/check.sh
