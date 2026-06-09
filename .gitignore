@@ -41,3 +41,4 @@ htmlcov/
 
 # ...but the committed example reports are tracked deliberately.
 !examples/reports/*.toa-report.md
+.venv-qa/
