@@ -259,6 +259,33 @@ def derive_memo_no_marker(dest: Path) -> Path:
     return dest
 
 
+def derive_brief_no_toa(dest: Path) -> Path:
+    """Copy the clean brief and delete its whole TOA section → TT-005, suppressed.
+
+    Removes the ``TABLE OF AUTHORITIES`` heading and every entry through the next
+    ``Heading 1``, leaving no marker and no heading. Unlike the marker memo, this
+    brief has a Carmody pinpoint that lands near a page boundary once the TOA is
+    gone, so it regresses the no-placement measurement path (see QA Round 2).
+    """
+    shutil.copy(EXAMPLE_BRIEFS / "clean_appellate_brief.docx", dest)
+    document = docx.Document(str(dest))
+    paragraphs = document.paragraphs
+    start = next(
+        i
+        for i, p in enumerate(paragraphs)
+        if p.text.strip().upper() == "TABLE OF AUTHORITIES"
+    )
+    end = len(paragraphs)
+    for j in range(start + 1, len(paragraphs)):
+        if paragraphs[j].style.name == "Heading 1":
+            end = j
+            break
+    for para in reversed(paragraphs[start:end]):
+        para._p.getparent().remove(para._p)
+    document.save(str(dest))
+    return dest
+
+
 def derive_dirty_plus_marker(dest: Path) -> Path:
     """Copy the dirty brief and add a ``[[TOA]]`` marker before the body → TT-006."""
     shutil.copy(EXAMPLE_BRIEFS / "dirty_motion_brief.docx", dest)
@@ -279,6 +306,12 @@ def dirty_plus_phantom(tmp_path: Path) -> Path:
 def memo_no_marker(tmp_path: Path) -> Path:
     """Path to a freshly derived memo-minus-marker fixture."""
     return derive_memo_no_marker(tmp_path / "memo_no_marker.docx")
+
+
+@pytest.fixture()
+def brief_no_toa(tmp_path: Path) -> Path:
+    """Path to the clean brief with its entire TOA section removed (no marker)."""
+    return derive_brief_no_toa(tmp_path / "brief_no_toa.docx")
 
 
 @pytest.fixture()

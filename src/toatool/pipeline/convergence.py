@@ -156,6 +156,7 @@ def freeze_registry(
     font_substitutions: list[renderer.FontSubstitution],
     iteration_count: int,
     converged: bool,
+    output_suppressed: bool = False,
 ) -> CitationRegistry:
     """Freeze the canonical registry from settled working authorities.
 
@@ -168,18 +169,24 @@ def freeze_registry(
         font_substitutions: Font substitutions detected for the render.
         iteration_count: Iterations the loop took.
         converged: Whether the loop converged within the cap.
+        output_suppressed: True on the no-placement path, where no ``.docx`` /
+            TOA is emitted. A missing page is then tolerated (kept as ``None``)
+            rather than fatal, because the guard's premise — that a TOA entry is
+            about to be written — does not hold. See ``docs/QA_ROUND2.md``.
 
     Returns:
         The immutable :class:`CitationRegistry`.
 
     Raises:
-        ConvergenceError: If any authority occurrence has no measured page.
+        ConvergenceError: If an authority occurrence has no measured page *and*
+            output is not suppressed (i.e. a TOA entry would actually be emitted
+            with that missing page).
     """
     frozen: list[Authority] = []
     for auth in sorted(authorities, key=lambda a: (a.group, a.sort_key)):
         occurrences: list[Occurrence] = []
         for occ in auth.occurrences:
-            if occ.page is None:
+            if occ.page is None and not output_suppressed:
                 raise ConvergenceError(
                     f"authority '{auth.display_full}' has an occurrence with no "
                     f"measured page (¶{occ.paragraph_index} '{occ.raw_text}'); "
@@ -296,6 +303,7 @@ def generate(
         font_substitutions=font_subs,
         iteration_count=iterations,
         converged=converged,
+        output_suppressed=blocks,
     )
 
     return GenerationResult(

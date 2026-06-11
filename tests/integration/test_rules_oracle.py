@@ -169,6 +169,26 @@ def test_oracle_memo_no_marker(frap: CourtProfile, memo_no_marker: Path) -> None
     assert rules.exit_code == 1
 
 
+def test_oracle_brief_no_toa(frap: CourtProfile, brief_no_toa: Path) -> None:
+    """clean − TOA (no marker) → TT-005 ×1 (error, high); .docx suppressed; exit 1.
+
+    Regression (QA Round 2): a no-placement input whose body has an occurrence
+    that becomes unmeasurable in the TOA-less render must still degrade to a
+    clean TT-005, not raise ConvergenceError. The marker-memo fixture above does
+    not exercise this because its citations have no boundary-prone pinpoint.
+    """
+    gen, rules = _run(brief_no_toa, frap)
+    _assert_tt008_matches_environment(gen, rules)
+    assert _besides_tt008(rules) == Counter({"TT-005": 1})
+
+    tt005 = _finding(rules, "TT-005")
+    assert tt005.severity == "error" and tt005.confidence == "high"
+    assert tt005.blocks_docx_output is True
+    assert gen.placement.mechanism == "none"
+    assert rules.docx_suppressed is True
+    assert rules.exit_code == 1
+
+
 def test_oracle_dirty_plus_marker(frap: CourtProfile, dirty_plus_marker: Path) -> None:
     """dirty + marker → marker wins: TT-006 ×1; diff rules (TT-002/003/004) skip.
 

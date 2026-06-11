@@ -36,6 +36,17 @@ heading variant); **patch** = documentation and clarity only.
   matter), dirty motion (six deliberate defects), marker trial
   memorandum (bootstrap path).
 
+### Fixed
+
+- No-placement path (TT-005) no longer raises `ConvergenceError` when a
+  body occurrence cannot be measured in the TOA-less render. The
+  missing-page guard in `freeze_registry` is now scoped to the
+  output-emitting path; when output is suppressed (no TOA is written) an
+  unmeasured occurrence is tolerated (`page = None`) so the run degrades
+  to a clean TT-005 instead of crashing. Found by QA Round 2's
+  defect-injection harness on the clean brief minus its TOA; regression
+  test `tests/integration/test_rules_oracle.py::test_oracle_brief_no_toa`.
+
 ### Notes
 
 - v0.1.0 will be tagged when the implementation passes the full quality

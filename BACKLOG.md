@@ -1,8 +1,9 @@
 # Backlog
 
-Deferred, post-v1 items surfaced during QA. Neither is a bug against the
-v1 spec — both are enhancements scoped to **v1.1**. Captured here so they
-are not lost; none is committed against current behavior.
+Deferred, post-v1 items surfaced during QA, scoped to **v1.1**. Captured
+here so they are not lost. BL-1 and BL-2 are enhancements, not bugs against
+the v1 spec; BL-3 is a known robustness limitation whose acute symptom was
+already fixed (see its note).
 
 ---
 
@@ -84,3 +85,52 @@ documented — but the silent overwrite is a footgun worth closing in v1.1.
 
 **Note:** option 3 must be reconciled with the determinism guarantee before
 it can be considered; options 1 and 2 do not touch determinism.
+
+---
+
+### BL-3 — Occurrence measurement is fragile at page boundaries
+
+**Type:** robustness limitation
+**Found during:** QA Round 2 (defect-injection harness)
+**Severity:** low (acute symptom fixed; residual is a measurement-quality gap)
+
+The page locator measures a citation's page by matching its occurrence
+string against the text of each rendered page. When a layout change pushes
+an occurrence onto a page boundary so the string is split across two pages,
+no single page contains the whole match and the occurrence gets no measured
+page (`page = None`). This is the same boundary sensitivity that underlies
+TT-007, but here it affects *measurement* rather than *convergence*.
+
+**What was already fixed (not deferred):** QA Round 2 hit this on the clean
+appellate brief with its TOA deleted — removing ~14 paragraphs shifted a
+Carmody pinpoint (`512 F.3d at 1047`) onto a page boundary, and the
+no-placement path raised `ConvergenceError` instead of reporting TT-005.
+That crash is fixed: the missing-page guard in `freeze_registry` is now
+scoped to the output-emitting path, so a suppressed-output run tolerates an
+unmeasured occurrence and degrades to a clean TT-005 (regression test
+`test_oracle_brief_no_toa`; see [QA_ROUND2_RESULTS.md](QA_ROUND2_RESULTS.md)).
+
+**What remains for v1.1:** the *measurement* itself is still best-effort at
+boundaries. The tolerated occurrence renders as `p.?` (REPORT_SPEC §5), so
+the user is not misled, but the page is simply unknown rather than correct.
+Options to harden it:
+
+1. **Boundary-aware matching** — match an occurrence against the
+   concatenation of adjacent rendered pages, attributing it to the page
+   where its first character falls, so a split string still resolves.
+2. **Normalized cross-page search** — strip page-break artifacts before
+   matching so a citation spanning a break is found.
+3. **Accept and disclose** — keep `p.?` but add an explicit info-level
+   disclosure when an occurrence could not be located, rather than a silent
+   null (today it is silent outside the suppressed-output path's findings).
+
+**Touches (once an option is chosen):**
+
+- `src/toatool/pipeline/locator.py` (occurrence-to-page matching).
+- Possibly `src/toatool/pipeline/convergence.py` (`freeze_registry`
+  null-page handling on the emitting path).
+- Tests — `tests/integration/test_rules_oracle.py` and locator unit tests.
+
+**Note:** option 3 is the smallest change and is purely additive; options 1
+and 2 improve accuracy but touch the measurement core and need their own
+regression fixtures (a brief deliberately laid out to split an occurrence).
