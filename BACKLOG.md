@@ -143,3 +143,48 @@ prevents a silently-wrong or missing page).
 **Note:** options 1 and 2 touch the measurement core and need their own
 regression fixtures; with TT-009 in place they are an accuracy enhancement,
 no longer a dead-end risk.
+
+---
+
+### BL-4 — Citation extraction reads body paragraphs only
+
+**Type:** coverage limitation
+**Found during:** QA Round 3 (C2-c)
+**Severity:** low
+
+`extractor.build_body` concatenates the document's body *paragraphs*
+(`document.paragraphs`), which excludes text living in **tables**, **text
+boxes**, and **footnotes/endnotes**. A citation that appears *only* in one of
+those is silently not extracted: it never becomes an authority, never lands in
+the generated TOA, and produces no finding.
+
+QA Round 3 C2-c (a citation placed in a table cell) passed the harness only
+because the surrounding brief still had body prose — the run did not crash and a
+report was written. But the table-only citation itself was missed with no
+disclosure. A brief whose citations are *predominantly* in footnotes (common in
+some practice areas) or tables would under-generate its TOA.
+
+**Why deferred:** this is a feature-coverage gap, not a safety one — the tool
+degrades quietly rather than crashing or emitting a wrong page. Closing it is
+real work: footnote/endnote text lives in separate OOXML parts
+(`footnotes.xml`), and table/text-box text needs a recursive walk of the
+document body, both of which also need the paragraph/char-span anchoring the
+locator relies on.
+
+**Options for v1.1:**
+
+1. **Extend `build_body`** to walk tables and text boxes (and footnotes) in
+   document order, extending the offset map so occurrences still anchor to a
+   `(paragraph_index, char_span)` the locator can place.
+2. **Disclose, don't extract (interim).** Detect citation-shaped text in
+   tables/footnotes and emit a warning ("citations found outside the body were
+   not indexed") without trying to place them — a smaller, honest stopgap.
+
+**Touches:**
+
+- `src/toatool/pipeline/extractor.py` (body walk + offset map).
+- Possibly the parser (to surface table/footnote text) and the locator.
+- Tests — a fixture with a footnote-only and a table-only citation.
+
+**Note:** option 2 is the lighter, honest interim; option 1 is the real fix but
+the largest extraction change in the pipeline.
