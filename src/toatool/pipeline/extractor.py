@@ -17,6 +17,16 @@ from toatool.pipeline.parser import ParsedDocument
 _SEPARATOR = "\n"
 
 
+class EmptyDocumentError(Exception):
+    """Raised when the document has no readable body text to scan for citations.
+
+    A valid but text-empty ``.docx`` (a scanned/image-only brief, or a document
+    whose body is genuinely empty) has nothing for the resolver to read. This is
+    an unprocessable input — surfaced as a clean ``exit 2`` with OCR guidance,
+    not a TOA-placement finding (QA Round 3, C1-i).
+    """
+
+
 @dataclass(frozen=True)
 class BodyText:
     """The concatenated body text plus a paragraph offset map."""

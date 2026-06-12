@@ -259,6 +259,12 @@ def generate(
     )
     excluded, anchor = _excluded_and_anchor(parsed, place)
     body = extractor.build_body(parsed, excluded)
+    if not body.text.strip():
+        raise extractor.EmptyDocumentError(
+            f"no readable text found in '{input_path.name}'. If the document is "
+            f"scanned or image-only, run OCR to make its text selectable, then "
+            f"try again."
+        )
     resolved = resolver.resolve(parsed, body, profile)
     toa = toa_builder.build_toa(resolved.authorities, profile)
     occurrences = _ordered_occurrences(resolved.authorities, resolved.unresolved)

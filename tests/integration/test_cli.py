@@ -11,6 +11,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import docx
 import pytest
 from click.testing import CliRunner
 
@@ -49,6 +50,27 @@ def test_generate_malformed_input_exits_2(runner: CliRunner, tmp_path: Path) -> 
     result = runner.invoke(main, ["generate", str(bad)])
     assert result.exit_code == 2
     assert "error:" in result.output
+
+
+def test_generate_textless_docx_rejected_with_ocr_hint(
+    runner: CliRunner, tmp_path: Path
+) -> None:
+    """A valid .docx with no readable text is rejected (exit 2) with OCR guidance.
+
+    Round 3 / C1-i: an empty or image-only document must not crash the resolver
+    (eyecite rejects empty text), and must surface honest advice — OCR — not
+    TT-005's "add a heading/marker", which is the wrong fix for a textless input.
+    Fails before any render, so no LibreOffice is needed.
+    """
+    textless = tmp_path / "scanned.docx"
+    docx.Document().save(str(textless))
+    result = runner.invoke(main, ["generate", str(textless)])
+    assert result.exit_code == 2, result.output
+    lower = result.output.lower()
+    assert "no readable text" in lower
+    assert "ocr" in lower
+    # Not TT-005's placement advice, which would be wrong for a textless file.
+    assert "heading" not in lower and "marker" not in lower
 
 
 def test_generate_missing_input_exits_2(runner: CliRunner, tmp_path: Path) -> None:

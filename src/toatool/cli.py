@@ -31,6 +31,7 @@ from toatool.engine.rule_loader import load_rule_cards
 from toatool.engine.runner import RuleRunResult, run_rules
 from toatool.pipeline import convergence
 from toatool.pipeline.convergence import GenerationResult
+from toatool.pipeline.extractor import EmptyDocumentError
 from toatool.pipeline.parser import ParserError
 from toatool.pipeline.renderer import RenderError
 from toatool.report import render_report
@@ -119,7 +120,7 @@ def generate(
 
     try:
         gen = convergence.generate(brief, profile, toa_heading=toa_heading)
-    except (ParserError, RenderError) as exc:
+    except (ParserError, RenderError, EmptyDocumentError) as exc:
         _fail(str(exc))
 
     rules = run_rules(gen, input_path=brief, profile=profile)
