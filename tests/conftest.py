@@ -22,6 +22,8 @@ from typing import Any
 
 import docx
 import pytest
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RULES_DIR = REPO_ROOT / "rules"
@@ -286,6 +288,45 @@ def derive_brief_no_toa(dest: Path) -> Path:
     return dest
 
 
+def _split_with_page_break(paragraph: Any, marker: str) -> None:
+    """Insert a hard page break immediately before ``marker`` in ``paragraph``.
+
+    Rebuilds the paragraph's runs so a ``<w:br w:type="page"/>`` sits between the
+    text before ``marker`` and ``marker`` onward. The break carries no text, so
+    ``paragraph.text`` is unchanged and the citation still parses intact; only the
+    *rendered* layout splits there.
+    """
+    text = paragraph.text
+    index = text.find(marker)
+    prefix, rest = text[:index], text[index:]
+    for run in list(paragraph.runs):
+        run._element.getparent().remove(run._element)
+    paragraph.add_run(prefix)
+    break_run = paragraph.add_run()
+    page_break = OxmlElement("w:br")
+    page_break.set(qn("w:type"), "page")
+    break_run._element.append(page_break)
+    paragraph.add_run(rest)
+
+
+def derive_brief_unmeasured_occurrence(dest: Path) -> Path:
+    """Copy the clean brief and split a pincite across a page boundary → TT-009.
+
+    Injects a hard page break inside the Carmody pincite ``512 F.3d at 1047`` so
+    its rendered text spans two physical pages. The locator joins pages with a
+    newline, so that occurrence can no longer be matched and its page is
+    unmeasured — exercising the emitting-path graceful-degradation path (QA Round
+    3, C2-a). Deterministic and font/version-independent, unlike padding the body
+    to shift pagination.
+    """
+    shutil.copy(EXAMPLE_BRIEFS / "clean_appellate_brief.docx", dest)
+    document = docx.Document(str(dest))
+    target = next(p for p in document.paragraphs if "512 F.3d at 1047" in p.text)
+    _split_with_page_break(target, "1047")
+    document.save(str(dest))
+    return dest
+
+
 def derive_dirty_plus_marker(dest: Path) -> Path:
     """Copy the dirty brief and add a ``[[TOA]]`` marker before the body → TT-006."""
     shutil.copy(EXAMPLE_BRIEFS / "dirty_motion_brief.docx", dest)
@@ -312,6 +353,14 @@ def memo_no_marker(tmp_path: Path) -> Path:
 def brief_no_toa(tmp_path: Path) -> Path:
     """Path to the clean brief with its entire TOA section removed (no marker)."""
     return derive_brief_no_toa(tmp_path / "brief_no_toa.docx")
+
+
+@pytest.fixture()
+def brief_unmeasured_occurrence(tmp_path: Path) -> Path:
+    """Path to the clean brief with a pincite split across a page boundary."""
+    return derive_brief_unmeasured_occurrence(
+        tmp_path / "brief_unmeasured_occurrence.docx"
+    )
 
 
 @pytest.fixture()

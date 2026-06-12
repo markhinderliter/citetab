@@ -7,7 +7,7 @@ from toatool.report import mask_report
 _SAMPLE = (
     "# toatool report — brief.docx\n"
     "\n"
-    "- engine 0.1.0 · rule pack toa 1.0.0 · profile frap 1.0.0\n"
+    "- engine 0.1.0 · rule pack toa 1.1.0 · profile frap 1.0.0\n"
     "- input: brief.docx (sha256 0123456789ab…)\n"
     "- render: LibreOffice 24.2.7.2 headless · fonts substituted (Consolas → DejaVu)\n"
     '- placement: heading "TABLE OF AUTHORITIES"\n'

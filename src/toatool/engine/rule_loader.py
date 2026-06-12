@@ -34,7 +34,7 @@ _FRONTMATTER_DELIMITER = "---"
 
 #: The ``toa`` rule-pack version (the rule-pack SemVer track, ``rules/CHANGELOG.md``).
 #: Recorded on every finding and in the registry's run metadata.
-RULE_PACK_VERSION = "1.0.0"
+RULE_PACK_VERSION = "1.1.0"
 
 
 class RuleLoaderError(Exception):

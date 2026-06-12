@@ -189,6 +189,41 @@ def test_oracle_brief_no_toa(frap: CourtProfile, brief_no_toa: Path) -> None:
     assert rules.exit_code == 1
 
 
+def test_oracle_brief_unmeasured_occurrence(
+    frap: CourtProfile, brief_unmeasured_occurrence: Path
+) -> None:
+    """clean + a pincite split across a page boundary → graceful TT-009 disclosure.
+
+    Round 3 / C2-a: on the emitting path an occurrence that cannot be measured
+    must degrade honestly — the `.docx` is still written, the unmeasured pincite
+    is disclosed (TT-009, warning) and rendered ``p.?``, and the rest of the
+    authority's measured pages survive. Nothing is silently dropped, and nothing
+    crashes.
+    """
+    gen, rules = _run(brief_unmeasured_occurrence, frap)
+    _assert_tt008_matches_environment(gen, rules)
+
+    # (1) Graceful: the disclosure fires, no error-severity finding, .docx written.
+    tt009 = _finding(rules, "TT-009")
+    assert tt009.severity == "warning" and tt009.confidence == "high"
+    assert rules.error_count == 0
+    assert rules.docx_suppressed is False
+    assert rules.exit_code == 0
+
+    # (2) The straddling pincite is retained as unmeasured (renders p.?), not dropped;
+    # the rest of the authority's measured pages survive intact.
+    carmody = next(a for a in gen.registry.authorities if "Carmody" in a.display_full)
+    unmeasured = [o for o in carmody.occurrences if o.page is None]
+    measured = [o.page for o in carmody.occurrences if o.page is not None]
+    assert len(unmeasured) == 1 and "1047" in unmeasured[0].raw_text
+    assert measured, "the authority must retain its measured occurrences"
+    assert carmody.pages == sorted(set(measured)), "no measured page silently dropped"
+
+    # (3) The TT-009 finding names the unmeasured occurrence and renders it p.?.
+    refs = tt009.evidence.occurrence_references
+    assert any(r.page is None and "1047" in r.excerpt for r in refs)
+
+
 def test_oracle_dirty_plus_marker(frap: CourtProfile, dirty_plus_marker: Path) -> None:
     """dirty + marker → marker wins: TT-006 ×1; diff rules (TT-002/003/004) skip.
 

@@ -27,6 +27,7 @@ from toatool.rules.tt005 import TT005
 from toatool.rules.tt006 import TT006
 from toatool.rules.tt007 import TT007
 from toatool.rules.tt008 import TT008
+from toatool.rules.tt009 import TT009
 
 #: Every implemented rule, keyed by its rule id. The runner validates this set
 #: against the loaded cards (Principle 8.5 drift check) before building rules.
@@ -39,6 +40,7 @@ RULE_CLASSES: dict[str, type[BaseRule]] = {
     "TT-006": TT006,
     "TT-007": TT007,
     "TT-008": TT008,
+    "TT-009": TT009,
 }
 
 

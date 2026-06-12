@@ -15,7 +15,25 @@ rule is added, or behavior is extended without reinterpreting old output;
 
 ## [Unreleased]
 
-### Added
+### Added — pack **v1.1.0**
+
+- **TT-009 — Unlocated occurrence** (`warning`, `high`, does not suppress
+  the `.docx`), card v1.0.0. Discloses a citation occurrence the page
+  locator could not place (typically a citation whose text straddles a
+  physical page boundary): the occurrence is rendered `p.?`, the `.docx` is
+  still written, and every other occurrence and page survives. **Minor**
+  bump — a rule is added without reinterpreting any existing output.
+
+  This closes the BL-3 emitting-path dead-end found in QA Round 3: an
+  unmeasurable occurrence on the emitting path previously raised an uncaught
+  `ConvergenceError` (stack trace, no output). `freeze_registry` now tolerates
+  a null page and TT-009 discloses it. See `docs/QA_ROUND3.md`.
+
+  | ID     | Name                 | Severity | Confidence | Suppresses .docx |
+  |--------|----------------------|----------|------------|------------------|
+  | TT-009 | Unlocated occurrence | warning  | high       | no               |
+
+### Added — pack **v1.0.0**
 
 - Initial `toa` rule pack, **v1.0.0**, with eight rules (each v1.0.0).
   Severities and confidences below are taken directly from the ratified

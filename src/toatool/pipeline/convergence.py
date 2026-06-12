@@ -156,12 +156,18 @@ def freeze_registry(
     font_substitutions: list[renderer.FontSubstitution],
     iteration_count: int,
     converged: bool,
-    output_suppressed: bool = False,
 ) -> CitationRegistry:
     """Freeze the canonical registry from settled working authorities.
 
+    An occurrence the locator could not place keeps ``page = None`` rather than
+    being fatal: the registry is frozen as-is, the ``.docx`` is still written with
+    the pages that *were* measured, and TT-009 discloses the unmeasured
+    occurrence (rendered ``p.?``). This is honest degradation over a crash or a
+    silently dropped page — the BL-3 fix found in QA Round 3 (see
+    ``docs/QA_ROUND3.md``). Earlier builds raised ``ConvergenceError`` here.
+
     Args:
-        authorities: The working authorities, with pages assigned.
+        authorities: The working authorities, with pages assigned where measured.
         profile: The active court profile.
         input_path: The input brief (for its hash).
         render_engine: Render engine identity.
@@ -169,29 +175,14 @@ def freeze_registry(
         font_substitutions: Font substitutions detected for the render.
         iteration_count: Iterations the loop took.
         converged: Whether the loop converged within the cap.
-        output_suppressed: True on the no-placement path, where no ``.docx`` /
-            TOA is emitted. A missing page is then tolerated (kept as ``None``)
-            rather than fatal, because the guard's premise — that a TOA entry is
-            about to be written — does not hold. See ``docs/QA_ROUND2.md``.
 
     Returns:
         The immutable :class:`CitationRegistry`.
-
-    Raises:
-        ConvergenceError: If an authority occurrence has no measured page *and*
-            output is not suppressed (i.e. a TOA entry would actually be emitted
-            with that missing page).
     """
     frozen: list[Authority] = []
     for auth in sorted(authorities, key=lambda a: (a.group, a.sort_key)):
         occurrences: list[Occurrence] = []
         for occ in auth.occurrences:
-            if occ.page is None and not output_suppressed:
-                raise ConvergenceError(
-                    f"authority '{auth.display_full}' has an occurrence with no "
-                    f"measured page (¶{occ.paragraph_index} '{occ.raw_text}'); "
-                    f"refusing to emit a TOA entry with a missing page"
-                )
             occurrences.append(
                 Occurrence(
                     form=occ.form,
@@ -303,7 +294,6 @@ def generate(
         font_substitutions=font_subs,
         iteration_count=iterations,
         converged=converged,
-        output_suppressed=blocks,
     )
 
     return GenerationResult(

@@ -1,10 +1,8 @@
-"""Tests for the registry freeze invariant (the hard null-page assertion)."""
+"""Tests for the registry freeze: measured pages, and tolerated null pages."""
 
 from __future__ import annotations
 
 from pathlib import Path
-
-import pytest
 
 from toatool.engine.profile_loader import load_profile_by_id
 from toatool.pipeline import convergence
@@ -62,7 +60,13 @@ def test_freeze_with_pages_builds_registry() -> None:
     assert registry.run_metadata.iteration_count == 1
 
 
-def test_freeze_raises_on_null_page() -> None:
-    """A converged registry with a null occurrence page fails loudly."""
-    with pytest.raises(convergence.ConvergenceError, match="no .*measured page"):
-        _freeze(_authority(page=None))
+def test_freeze_tolerates_null_page() -> None:
+    """An unmeasured occurrence is kept as ``None`` (rendered p.?), not fatal.
+
+    The emitting path no longer raises on a null page; freeze keeps it so the
+    ``.docx`` is still written and TT-009 can disclose it (QA Round 3 / BL-3).
+    """
+    registry = _freeze(_authority(page=None))
+    occurrence = registry.authorities[0].occurrences[0]
+    assert occurrence.page is None
+    assert registry.authorities[0].pages == []  # no measured page contributed

@@ -1,6 +1,6 @@
 """Tests for the rule-card loader and the drift check.
 
-Validates that all eight TT cards load with the frontmatter the design package
+Validates that all nine TT cards load with the frontmatter the design package
 specifies, that malformed cards fail loudly, and that the
 card-vs-implementation drift check catches every kind of mismatch.
 """
@@ -20,7 +20,7 @@ from toatool.engine.rule_loader import (
     validate_implementations,
 )
 
-ALL_RULE_IDS = {f"TT-00{n}" for n in range(1, 9)}
+ALL_RULE_IDS = {f"TT-00{n}" for n in range(1, 10)}
 
 # Severity/confidence/blocking taken directly from the ratified rule cards and
 # rules/CHANGELOG.md, so this also guards against a card's frontmatter drifting.
@@ -33,11 +33,12 @@ EXPECTED = {
     "TT-006": ("warning", "high", False),
     "TT-007": ("error", "high", False),
     "TT-008": ("warning", "high", False),
+    "TT-009": ("warning", "high", False),
 }
 
 
-def test_all_eight_cards_load(rules_dir: Path) -> None:
-    """The toa pack loads exactly the eight TT cards."""
+def test_all_nine_cards_load(rules_dir: Path) -> None:
+    """The toa pack loads exactly the nine TT cards."""
     cards = load_rule_cards(rules_dir)
     assert set(cards) == ALL_RULE_IDS
 
@@ -67,7 +68,7 @@ def test_tt005_is_the_only_blocking_rule(rules_dir: Path) -> None:
 
 
 def test_all_cards_are_active(rules_dir: Path) -> None:
-    """All eight cards are active in v1."""
+    """All nine cards are active in v1."""
     cards = load_rule_cards(rules_dir)
     assert active_rule_ids(cards) == ALL_RULE_IDS
 

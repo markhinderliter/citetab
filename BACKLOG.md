@@ -91,8 +91,9 @@ it can be considered; options 1 and 2 do not touch determinism.
 ### BL-3 — Occurrence measurement is fragile at page boundaries
 
 **Type:** robustness limitation
-**Found during:** QA Round 2 (defect-injection harness)
-**Severity:** low (acute symptom fixed; residual is a measurement-quality gap)
+**Found during:** QA Round 2 (no-placement path), QA Round 3 (emitting path)
+**Severity:** low (both crash paths fixed + disclosed; residual is a
+measurement-*accuracy* gap, not a safety one)
 
 The page locator measures a citation's page by matching its occurrence
 string against the text of each rendered page. When a layout change pushes
@@ -101,36 +102,44 @@ no single page contains the whole match and the occurrence gets no measured
 page (`page = None`). This is the same boundary sensitivity that underlies
 TT-007, but here it affects *measurement* rather than *convergence*.
 
-**What was already fixed (not deferred):** QA Round 2 hit this on the clean
-appellate brief with its TOA deleted — removing ~14 paragraphs shifted a
-Carmody pinpoint (`512 F.3d at 1047`) onto a page boundary, and the
-no-placement path raised `ConvergenceError` instead of reporting TT-005.
-That crash is fixed: the missing-page guard in `freeze_registry` is now
-scoped to the output-emitting path, so a suppressed-output run tolerates an
-unmeasured occurrence and degrades to a clean TT-005 (regression test
-`test_oracle_brief_no_toa`; see [QA_ROUND2_RESULTS.md](QA_ROUND2_RESULTS.md)).
+**What is fixed (not deferred):** both crash paths and the disclosure gap are
+closed.
 
-**What remains for v1.1:** the *measurement* itself is still best-effort at
-boundaries. The tolerated occurrence renders as `p.?` (REPORT_SPEC §5), so
-the user is not misled, but the page is simply unknown rather than correct.
-Options to harden it:
+- *No-placement path (QA Round 2).* Deleting the TOA shifted a Carmody
+  pinpoint onto a boundary; the suppressed-output run raised
+  `ConvergenceError` instead of reporting TT-005. Fixed: `freeze_registry`
+  tolerates the null page and the run degrades to a clean TT-005 (regression
+  `test_oracle_brief_no_toa`).
+- *Emitting path (QA Round 3, C2-a).* A brief **with** its TOA where a
+  pincite straddles a page boundary previously raised an **uncaught**
+  `ConvergenceError` — stack trace, no output. Fixed: `freeze_registry` no
+  longer raises at all, and **TT-009 "unlocated occurrence"** (`warning`,
+  rule-pack v1.1.0) discloses each unmeasured occurrence; it renders `p.?`,
+  the `.docx` is still written, and every other measured page survives
+  (regression `test_oracle_brief_unmeasured_occurrence`; see
+  [QA_ROUND3_RESULTS.md](QA_ROUND3_RESULTS.md)).
+
+**What remains for v1.1 (accuracy only):** the *measurement* itself is still
+best-effort at boundaries — a split occurrence is now honestly disclosed as
+`p.?`, but its page is unknown rather than correct. Options to actually
+resolve the page:
 
 1. **Boundary-aware matching** — match an occurrence against the
    concatenation of adjacent rendered pages, attributing it to the page
    where its first character falls, so a split string still resolves.
 2. **Normalized cross-page search** — strip page-break artifacts before
    matching so a citation spanning a break is found.
-3. **Accept and disclose** — keep `p.?` but add an explicit info-level
-   disclosure when an occurrence could not be located, rather than a silent
-   null (today it is silent outside the suppressed-output path's findings).
+
+Both reduce how often TT-009 fires; neither is a safety fix (TT-009 already
+prevents a silently-wrong or missing page).
 
 **Touches (once an option is chosen):**
 
 - `src/toatool/pipeline/locator.py` (occurrence-to-page matching).
-- Possibly `src/toatool/pipeline/convergence.py` (`freeze_registry`
-  null-page handling on the emitting path).
-- Tests — `tests/integration/test_rules_oracle.py` and locator unit tests.
+- Tests — `tests/integration/test_rules_oracle.py` and locator unit tests;
+  the deterministic page-break fixture (`derive_brief_unmeasured_occurrence`)
+  is a ready regression base.
 
-**Note:** option 3 is the smallest change and is purely additive; options 1
-and 2 improve accuracy but touch the measurement core and need their own
-regression fixtures (a brief deliberately laid out to split an occurrence).
+**Note:** options 1 and 2 touch the measurement core and need their own
+regression fixtures; with TT-009 in place they are an accuracy enhancement,
+no longer a dead-end risk.

@@ -82,10 +82,10 @@ def test_profiles_show_unknown_exits_2(runner: CliRunner) -> None:
 
 
 def test_rules_list(runner: CliRunner) -> None:
-    """`rules list` names all eight rules."""
+    """`rules list` names all nine rules."""
     result = runner.invoke(main, ["rules", "list"])
     assert result.exit_code == 0
-    for rule_id in (f"TT-00{n}" for n in range(1, 9)):
+    for rule_id in (f"TT-00{n}" for n in range(1, 10)):
         assert rule_id in result.output
 
 
