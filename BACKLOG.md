@@ -188,3 +188,78 @@ locator relies on.
 
 **Note:** option 2 is the lighter, honest interim; option 1 is the real fix but
 the largest extraction change in the pipeline.
+
+---
+
+### BL-5 — Multi-court profile support
+
+**Type:** feature (court coverage)
+**Status:** deferred — do **not** start until the v1 installer ships; pulling it
+forward reopens v1 scope.
+**Depends on:** v1.0 released.
+
+v1 ships **FRAP as the only court profile**. The profile system was built for
+expansion — profiles are versioned YAML *data*, not code (see
+`_bundled/profiles/frap.yaml`) — and the applied profile is already disclosed on
+all three surfaces (report header, CLI stdout, GUI dialog) as of v1.0. What
+remains for multi-court support is: more profiles, a way to choose one in the
+GUI, and removing the silent FRAP default once a real choice exists.
+
+**Engineering vs. research — where the cost actually is.** Adding a profile is
+mechanically cheap: write the YAML (heading + detection variants, authority
+groups in render order, sort rules, passim threshold + text, formatting flags),
+drop it in `_bundled/profiles/`, add fixtures — **no engine change**. The expense
+is *not* the YAML; it is sourcing and validating each court's actual TOA rules. A
+wrong profile produces a confidently non-compliant brief — for this audience a
+**filing risk, not a cosmetic bug**. Each profile needs authoritative current
+court rules and a synthetic brief formatted to that court's conventions to
+validate the generated TOA against.
+
+**Scope — ships as one coherent feature, in this dependency order:**
+
+1. **Profile batch — federal appellate (tractable tier first).** SCOTUS + Ninth,
+   Second, Fifth Circuits. Federal, relatively uniform, layered on the FRAP
+   baseline already shipped — mostly confirming heading variants and any local
+   ordering/passim quirk against the existing profile. **State courts (CA, NY,
+   TX) are the HARD tier** — non-uniform, sometimes varying by court level,
+   sometimes with length-threshold rules for whether a TOA is even required — and
+   are deferred further, added **one at a time, not batched**.
+2. **Profile picker (GUI).** The GUI currently calls the core with a hardcoded
+   `court="frap"` ([app.py](src/citetab/app.py)). Add a selector so the user
+   chooses the court before generating. The CLI already exposes `--court`; no CLI
+   change is needed for selection.
+3. **Remove the silent default.** Once more than one profile exists, silently
+   defaulting to FRAP becomes a wrong-court hazard (e.g. a California user
+   silently gets FRAP). Decision for that point: **no silent default** — require
+   an explicit choice, or make the applied profile impossible to miss.
+
+**Why the order matters:** "no silent default" needs the picker (otherwise every
+CLI *and* GUI call breaks — they all rely on the court default); the picker needs
+more than one profile to be worth building. So **profiles → picker → no-default,
+as one v1.1 release**. Do not do "no default" alone.
+
+**Validation:** Cheryle (the project's user-voice; used Best Authority
+professionally) is the right reviewer to confirm a generated TOA looks correct
+for a given court — a judgment no amount of rule-reading substitutes for. Budget
+her review **per profile**, especially for the harder state courts.
+
+**Community-contribution surface:** because profiles are pure data with a defined
+format, *a court profile + a test brief* is an ideal external PR once the project
+is public — distributing the per-court research across practitioners who actually
+file in those courts rather than concentrating it on the maintainer. Document the
+profile-authoring format (largely already in the `_bundled/rules`/profiles README)
+to enable this.
+
+**Touches (when started):**
+
+- `src/citetab/_bundled/profiles/*.yaml` — new profiles (data only).
+- `src/citetab/app.py` — GUI profile selector.
+- Core/CLI — removing the silent `court="frap"` default
+  ([core.py](src/citetab/core.py) `run_generation`, [cli.py](src/citetab/cli.py)
+  `--court`) once a choice is mandatory.
+- Tests/fixtures — a synthetic per-court brief + oracle expectations per profile.
+- Docs — the profile-authoring guide for external contributors.
+
+**Note:** the three parts are sequenced by dependency, not severity; the
+per-profile research/validation cost (not the code) dominates, and grows sharply
+from the federal tier to the state tier.
