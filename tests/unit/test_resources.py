@@ -1,6 +1,6 @@
 """Tests for single-source data-path resolution via importlib.resources.
 
-The versioned data is package data under ``toatool/_bundled/``; resolvers return
+The versioned data is package data under ``citetab/_bundled/``; resolvers return
 a Traversable that works in a source checkout, a wheel, and a frozen app. These
 tests cover the live (source-checkout) resolution and a *simulated frozen
 layout* where the package resources are rooted at a temporary directory and no
@@ -16,9 +16,9 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine import resources
-from toatool.engine.profile_loader import load_profile
-from toatool.engine.rule_loader import load_rule_cards
+from citetab.engine import resources
+from citetab.engine.profile_loader import load_profile
+from citetab.engine.rule_loader import load_rule_cards
 
 _EXPECTED_RULE_CARDS = 9
 
@@ -45,7 +45,7 @@ def test_frozen_layout_resolves_and_loads(
     purely off that — exercising the single-mode path with no fallback — and
     iterdir-based discovery must still find all rule cards and the profile.
     """
-    real_bundled = Path(str(resources.files("toatool"))) / "_bundled"
+    real_bundled = Path(str(resources.files("citetab"))) / "_bundled"
     pkg_root = tmp_path / "frozen_pkg"
     shutil.copytree(real_bundled, pkg_root / "_bundled")
 

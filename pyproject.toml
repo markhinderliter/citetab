@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "toatool"
+name = "citetab"
 version = "0.1.0"
 description = "Free, local-first Table of Authorities generator for legal briefs. Citations parsed with eyecite; page numbers measured from a real LibreOffice render. Drafts for attorney review — not legal advice."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
-authors = [{ name = "toatool contributors" }]
+authors = [{ name = "citetab contributors" }]
 keywords = [
   "legal",
   "table-of-authorities",
@@ -55,7 +55,7 @@ dev = [
 ]
 
 [project.scripts]
-toatool = "toatool.cli:main"
+citetab = "citetab.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/markhinderliter/TOATool"
@@ -68,11 +68,11 @@ Changelog = "https://github.com/markhinderliter/TOATool/blob/main/CHANGELOG.md"
 # listed above. See README "System requirements".
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/toatool"]
+packages = ["src/citetab"]
 # The versioned data (rules/profiles/schemas) is the single source of truth
-# under src/toatool/_bundled/ and ships as ordinary package data — included
+# under src/citetab/_bundled/ and ships as ordinary package data — included
 # automatically with the package, no force-include needed. The engine resolves
-# it via importlib.resources.files("toatool")/"_bundled", which works in a
+# it via importlib.resources.files("citetab")/"_bundled", which works in a
 # source/editable checkout, an installed wheel, and a frozen app (including
 # zipimport), so a bundled installer can be built without relocating data.
 
@@ -126,7 +126,7 @@ follow_imports = "skip"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=toatool --cov-report=term-missing --cov-fail-under=85"
+addopts = "--cov=citetab --cov-report=term-missing --cov-fail-under=85"
 
 [tool.coverage.run]
-source = ["src/toatool"]
+source = ["src/citetab"]

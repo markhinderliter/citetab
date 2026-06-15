@@ -33,7 +33,7 @@ htmlcov/
 *.swp
 .DS_Store
 
-# toatool run artifacts (regenerated outputs of a run, never committed)
+# citetab run artifacts (regenerated outputs of a run, never committed)
 *.toa.docx
 *.toa-report.md
 *.toa-report.json

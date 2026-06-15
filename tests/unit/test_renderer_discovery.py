@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import pytest
 
-from toatool.pipeline import renderer
+from citetab.pipeline import renderer
 
-_ENV = "TOATOOL_LIBREOFFICE"
+_ENV = "CITETAB_LIBREOFFICE"
 
 
 def _no_standard_paths(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -27,7 +27,7 @@ def _which_none(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_env_override_wins(monkeypatch: pytest.MonkeyPatch) -> None:
-    """An executable TOATOOL_LIBREOFFICE path is returned before any other probe."""
+    """An executable CITETAB_LIBREOFFICE path is returned before any other probe."""
     override = "/custom/soffice"
     monkeypatch.setenv(_ENV, override)
     monkeypatch.setattr(renderer, "_is_executable", lambda p: p == override)

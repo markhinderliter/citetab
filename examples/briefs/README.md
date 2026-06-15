@@ -1,4 +1,4 @@
-# toatool Example Briefs (Step B fixtures)
+# citetab Example Briefs (Step B fixtures)
 
 Three synthetic .docx briefs. All case names, parties, and citations are
 fictional; citation **formats** are valid Bluebook patterns so eyecite can
@@ -10,7 +10,7 @@ rendering through LibreOffice headless. The page numbers below are
 **physical PDF page indices measured in this build's environment**
 (LibreOffice 24.2). Because no Times New Roman or Consolas is installed
 here, LibreOffice substitutes fonts — `Consolas → DejaVu Sans Mono` is the
-substitution toatool discloses per spec §3.1; pages can drift ±1 versus a
+substitution citetab discloses per spec §3.1; pages can drift ±1 versus a
 Microsoft-font render, which is exactly the disclosure behavior the tool
 exists to surface.
 
@@ -33,7 +33,7 @@ FRAP-style Ninth Circuit appellant's brief.
   TOA-length change does not shift body pages and spec §3.2's regeneration
   loop converges on the **first check**.
 - **TOA page numbers are real and reconciled.** The input TOA mirrors the
-  registry toatool measures from a render: every authority the body cites is
+  registry citetab measures from a render: every authority the body cites is
   listed (including the two jurisdictional statutes), and every page list is
   the measured value. So the clean fixture is **finding-free** — the input TOA
   diffs clean against the generated TOA (no missing/stale/phantom entry).
@@ -56,7 +56,7 @@ The passim boundary is exercised by the dirty fixture (D4/D5 below), not
 here — clean's most-cited authority, *Carmody*, sits at four pages, well
 under the five-page threshold.
 
-**Expected toatool behavior:** detect TOA via heading; regenerate;
+**Expected citetab behavior:** detect TOA via heading; regenerate;
 converge immediately; output TOA semantically identical to the input
 TOA; no error/warning findings.
 
@@ -89,7 +89,7 @@ Measured authorities (this environment):
 | 15 U.S.C. § 1692e | 1 |
 | 12 C.F.R. § 1006.14 | 4 |
 
-**Expected toatool behavior:** detect TOA via heading; regenerate with
+**Expected citetab behavior:** detect TOA via heading; regenerate with
 Okafor added, all page numbers corrected, Carmody as passim, Delgado as
 a page list; converge within the iteration cap; emit findings for D1
 (entry was missing) and D3 (orphan short form, cannot be placed in the
@@ -107,7 +107,7 @@ caption and the introduction.
 Citations: 15 U.S.C. § 1692e; Carmody (full + one short form);
 Delgado; 12 C.F.R. § 1006.14.
 
-**Expected toatool behavior:** detect placement via the marker (spec
+**Expected citetab behavior:** detect placement via the marker (spec
 precedence level 2); consume the marker; insert a generated TOA under
 the standard heading. A second run on the output must detect via the
 heading path and converge with zero changes — the marker-to-heading
@@ -119,7 +119,7 @@ handoff that preserves idempotency.
 
 - `scripts/reconcile_fixtures.py` keeps the clean and dirty fixtures in
   sync with this environment's render: it rewrites the clean brief's input
-  TOA from toatool's own measure step (so the fixture stays finding-free)
+  TOA from citetab's own measure step (so the fixture stays finding-free)
   and inserts the dirty brief's sixth-page *Carmody* section (so D4 renders
   passim). The script is idempotent; `--check` verifies without modifying.
 - The page numbers above were measured under LibreOffice with font

@@ -17,9 +17,9 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine.profile_loader import CourtProfile, load_profile_by_id
-from toatool.pipeline import convergence, parser, placement, toa_builder
-from toatool.pipeline.input_toa_diff import build_baseline
+from citetab.engine.profile_loader import CourtProfile, load_profile_by_id
+from citetab.pipeline import convergence, parser, placement, toa_builder
+from citetab.pipeline.input_toa_diff import build_baseline
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 

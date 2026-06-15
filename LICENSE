@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 toatool contributors
+Copyright (c) 2026 citetab contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 ADDITIONAL NOTICE (not part of the MIT License terms above):
 
-toatool is document automation software. Its output is not legal advice
+citetab is document automation software. Its output is not legal advice
 and is not a substitute for attorney review. The filing attorney is
 responsible for every filing, including any table prepared with this
 tool. See LIABILITY.md for the project's full positioning.

@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes toatool **as built**. Where the implementation diverged
+This document describes citetab **as built**. Where the implementation diverged
 from the earlier design documents (`PRD.md`, `INPUT_OUTPUT_SPEC.md`,
 `REPORT_SPEC.md`, the rule cards, and `examples/briefs/README.md`), the
 divergence and its reason are recorded in [§9](#9-where-reality-diverged-from-the-design-docs)
@@ -11,7 +11,7 @@ specs remain the normative contracts; this file is the map of the territory.
 
 ## 1. What the tool does
 
-toatool ingests a `.docx` legal brief and produces two artifacts:
+citetab ingests a `.docx` legal brief and produces two artifacts:
 
 1. a copy of the brief with a **regenerated, court-rule-compliant Table of
    Authorities** whose page numbers are *measured* from a real LibreOffice
@@ -30,7 +30,7 @@ formatting decision is read from a versioned court **profile** (data, not code).
 ## 2. Repository layout (as built)
 
 ```
-src/toatool/
+src/citetab/
 ├── __init__.py          # __version__ (engine SemVer track)
 ├── cli.py               # Click CLI: generate / rules / profiles  (FR-11)
 ├── models/
@@ -46,7 +46,7 @@ src/toatool/
 │   ├── placement.py     # TOA placement precedence walk (FR-02)
 │   ├── extractor.py     # body text + char→paragraph offset map
 │   ├── resolver.py      # eyecite resolution → WorkingAuthority (FR-03/04)
-│   ├── supplemental.py  # toatool-owned recognizer seam (see §9.1)
+│   ├── supplemental.py  # citetab-owned recognizer seam (see §9.1)
 │   ├── courts.py        # court-name abbreviation
 │   ├── input_toa_diff.py# parse the input TOA into a diff baseline (FR-05)
 │   ├── toa_builder.py   # group/sort/passim → ToaModel (FR-06)
@@ -198,7 +198,7 @@ or rule). The iteration cap is fixed by spec at 5 and is not a flag.
 Recorded on every run and finding so any report is reproducible against the exact
 definitions in force:
 
-- **engine** — `toatool.__version__`
+- **engine** — `citetab.__version__`
 - **rule pack** — `RULE_PACK_VERSION` (`rules/CHANGELOG.md`)
 - **individual rule** — each card's `version`
 - **court profile** — each profile's `version`
@@ -210,7 +210,7 @@ definitions in force:
 `rules/toa/*.md` (cards), `profiles/*.yaml`, and `schemas/*.json` are loaded and
 validated at startup; the registry and finding models cross-validate against
 their JSON Schemas in both directions. The wheel force-includes `rules`,
-`profiles`, and `schemas` under `toatool/_bundled/` so `pip install toatool`
+`profiles`, and `schemas` under `citetab/_bundled/` so `pip install citetab`
 works without a clone; `resources.py` prefers the bundled copy, then the repo
 root.
 
@@ -234,7 +234,7 @@ not:
   eyecite citation *type* at all, so `get_citations` returns nothing for it.
 
 Rather than patch reporters_db (a vendored dependency we do not own) or fork
-eyecite, toatool owns a single deterministic recognizer layer,
+eyecite, citetab owns a single deterministic recognizer layer,
 `pipeline/supplemental.py`, that recognizes exactly these two shapes and emits
 the same `(identity, display_full, sort_key, type)` an eyecite authority would.
 Its candidates are merged in `resolver._merge_supplemental`, **de-duplicated by

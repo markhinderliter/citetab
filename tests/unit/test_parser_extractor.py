@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from toatool.pipeline import extractor, parser
+from citetab.pipeline import extractor, parser
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 

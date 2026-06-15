@@ -36,7 +36,7 @@ to act on without re-deriving paragraph order by hand.
 - `docs/REPORT_SPEC.md` §5 — document the `(first appearance)` convention
   alongside the existing occurrence-evidence rendering rules (the
   `¶{paragraph_index} p.{page} "{excerpt}"` line).
-- Renderer — `src/toatool/report/render.py` (occurrence-evidence rendering).
+- Renderer — `src/citetab/report/render.py` (occurrence-evidence rendering).
 - Example reports — regenerate `examples/reports/*.toa-report.md` from real
   runs so committed examples reflect the new label.
 - Tests — `tests/integration/test_report_render.py` and the report-mask /
@@ -79,7 +79,7 @@ documented — but the silent overwrite is a footgun worth closing in v1.1.
 
 - `docs/INPUT_OUTPUT_SPEC.md` §5.1 / §5.2 (output naming) and
   `docs/REPORT_SPEC.md` §1.
-- CLI — `src/toatool/cli.py` (output path resolution, any new flag, exit-code
+- CLI — `src/citetab/cli.py` (output path resolution, any new flag, exit-code
   wiring).
 - Tests — `tests/integration/test_cli.py`, `tests/integration/test_idempotency.py`.
 
@@ -135,7 +135,7 @@ prevents a silently-wrong or missing page).
 
 **Touches (once an option is chosen):**
 
-- `src/toatool/pipeline/locator.py` (occurrence-to-page matching).
+- `src/citetab/pipeline/locator.py` (occurrence-to-page matching).
 - Tests — `tests/integration/test_rules_oracle.py` and locator unit tests;
   the deterministic page-break fixture (`derive_brief_unmeasured_occurrence`)
   is a ready regression base.
@@ -182,7 +182,7 @@ locator relies on.
 
 **Touches:**
 
-- `src/toatool/pipeline/extractor.py` (body walk + offset map).
+- `src/citetab/pipeline/extractor.py` (body walk + offset map).
 - Possibly the parser (to surface table/footnote text) and the locator.
 - Tests — a fixture with a footnote-only and a table-only citation.
 

@@ -4,7 +4,7 @@
 **Version:** 0.1.0-draft (§5 finding-order key corrected 2026-06-09 — see §5 note)
 **Depends on:** `INPUT_OUTPUT_SPEC.md` §5 (output contract), `schemas/finding.schema.json`, the eight rule cards (`rules/toa/`), and the active court profile.
 
-This document is normative for the Markdown report toatool writes beside
+This document is normative for the Markdown report citetab writes beside
 the regenerated `.docx`. It pairs with `finding.schema.json`: the schema
 defines what a finding *is*; this spec defines how a run's TOA and findings
 are *rendered* for a human. The three files in `examples/reports/` are
@@ -38,7 +38,7 @@ findings, even when an error finding is present.
 A level-1 title followed by a fixed metadata block:
 
 ```
-# toatool report — {input_filename}
+# citetab report — {input_filename}
 
 - engine {engine_version} · rule pack toa {rule_pack_version} · profile {profile_id} {profile_version}
 - input: {input_filename} (sha256 {first 12 hex}…)
@@ -140,7 +140,7 @@ pack, fonts, and LibreOffice version), the report is byte-for-byte
 identical across runs, with two exceptions, both confined to the header:
 the `generated:` timestamp and — only if a future version surfaces it —
 any ULID. Tests normalize the `generated:` line before comparing against
-`examples/reports/`. Running toatool on its own output reproduces the same
+`examples/reports/`. Running citetab on its own output reproduces the same
 TOA with zero changes (`INPUT_OUTPUT_SPEC.md` §3.3); the second run's
 report differs only in the normalized timestamp.
 

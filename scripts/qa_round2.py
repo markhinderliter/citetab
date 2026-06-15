@@ -41,9 +41,9 @@ from docx import Document
 from docx.oxml import OxmlElement
 from docx.text.paragraph import Paragraph
 
-from toatool.engine.profile_loader import load_profile_by_id
-from toatool.engine.runner import run_rules
-from toatool.pipeline import convergence
+from citetab.engine.profile_loader import load_profile_by_id
+from citetab.engine.runner import run_rules
+from citetab.pipeline import convergence
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CLEAN = REPO_ROOT / "examples" / "briefs" / "clean_appellate_brief.docx"

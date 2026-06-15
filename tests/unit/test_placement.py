@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from toatool.pipeline import placement
+from citetab.pipeline import placement
 
 VARIANTS = ["Table of Authorities", "Table of Cited Authorities"]
 

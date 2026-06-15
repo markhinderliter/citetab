@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from toatool.report import mask_report
+from citetab.report import mask_report
 
 _SAMPLE = (
-    "# toatool report — brief.docx\n"
+    "# citetab report — brief.docx\n"
     "\n"
     "- engine 0.1.0 · rule pack toa 1.1.0 · profile frap 1.0.0\n"
     "- input: brief.docx (sha256 0123456789ab…)\n"

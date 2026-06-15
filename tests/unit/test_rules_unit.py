@@ -14,24 +14,24 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine.profile_loader import CourtProfile, load_profile_by_id
-from toatool.engine.rule_loader import RuleCard, load_rule_cards
-from toatool.engine.runner import RuleRunResult
-from toatool.models.registry import (
+from citetab.engine.profile_loader import CourtProfile, load_profile_by_id
+from citetab.engine.rule_loader import RuleCard, load_rule_cards
+from citetab.engine.runner import RuleRunResult
+from citetab.models.registry import (
     Authority,
     CitationRegistry,
     FontSubstitution,
     Occurrence,
     RunMetadata,
 )
-from toatool.pipeline.input_toa_diff import BaselineEntry, DiffBaseline
-from toatool.pipeline.placement import HeadingMatch, PlacementResult
-from toatool.rules import RULE_CLASSES, build_rules, sort_findings
-from toatool.rules.base import RuleContext, make_finding, occurrence_ref
-from toatool.rules.tt002 import TT002
-from toatool.rules.tt003 import TT003
-from toatool.rules.tt004 import TT004
-from toatool.rules.tt006 import TT006
+from citetab.pipeline.input_toa_diff import BaselineEntry, DiffBaseline
+from citetab.pipeline.placement import HeadingMatch, PlacementResult
+from citetab.rules import RULE_CLASSES, build_rules, sort_findings
+from citetab.rules.base import RuleContext, make_finding, occurrence_ref
+from citetab.rules.tt002 import TT002
+from citetab.rules.tt003 import TT003
+from citetab.rules.tt004 import TT004
+from citetab.rules.tt006 import TT006
 
 
 @pytest.fixture(scope="module")

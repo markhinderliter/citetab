@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from toatool.engine.profile_loader import load_profile_by_id
-from toatool.pipeline import convergence
-from toatool.pipeline.renderer import FontSubstitution
-from toatool.pipeline.working import WorkingAuthority, WorkingOccurrence
+from citetab.engine.profile_loader import load_profile_by_id
+from citetab.pipeline import convergence
+from citetab.pipeline.renderer import FontSubstitution
+from citetab.pipeline.working import WorkingAuthority, WorkingOccurrence
 
 CLEAN = (
     Path(__file__).resolve().parent.parent.parent

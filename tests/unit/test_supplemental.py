@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from toatool.pipeline import supplemental
+from citetab.pipeline import supplemental
 
 
 def _by_identity(text: str) -> dict[str, supplemental.SupplementalCitation]:

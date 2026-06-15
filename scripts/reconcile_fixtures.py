@@ -7,7 +7,7 @@ substitution; ±1 drift at the margins is accepted, per spec §3.1).
 
 1. CLEAN reconciliation
    Rewrite ``clean_appellate_brief.docx``'s input Table of Authorities so it
-   exactly mirrors the registry toatool measures: the two jurisdictional
+   exactly mirrors the registry citetab measures: the two jurisdictional
    statutes the body cites (``28 U.S.C. § 1331`` / ``§ 1291``) are added, and
    every page list is rewritten to its measured value. After this the input TOA
    diffs clean against the generated TOA — no missing entry (TT-002), no phantom
@@ -42,9 +42,9 @@ import docx
 from docx.document import Document as DocxDocument
 from docx.text.paragraph import Paragraph
 
-from toatool.engine.profile_loader import load_profile_by_id
-from toatool.pipeline import convergence, parser, placement, toa_builder
-from toatool.pipeline.input_toa_diff import DiffBaseline, build_baseline
+from citetab.engine.profile_loader import load_profile_by_id
+from citetab.pipeline import convergence, parser, placement, toa_builder
+from citetab.pipeline.input_toa_diff import DiffBaseline, build_baseline
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BRIEFS = REPO_ROOT / "examples" / "briefs"

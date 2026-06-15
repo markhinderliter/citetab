@@ -1,0 +1,64 @@
+# citetab court profile — FRAP default
+# Profiles are versioned data, not code. The TOA generator reads this;
+# nothing about grouping, ordering, passim, or headings is hardcoded.
+id: frap
+version: 1.0.0
+effective_date: "2026-06-05"
+description: >
+  Default profile. Federal Rules of Appellate Procedure: FRAP 28(a)(2)
+  requires a table of authorities with references to the pages of the
+  brief where they are cited. Group order and formatting follow
+  dominant federal appellate convention (Bluebook-style), since FRAP
+  itself does not prescribe them; both are profile data and trivially
+  varied in court-specific profiles.
+
+heading:
+  # Text used when citetab writes a TOA (including marker bootstrap).
+  generated_text: "TABLE OF AUTHORITIES"
+  # Detection variants for spec §2.4 precedence level 3.
+  # Matching is case-insensitive and whitespace-tolerant.
+  detection_variants:
+    - "Table of Authorities"
+    - "Table of Cited Authorities"
+
+# Grouping buckets, in render order. `types` maps from the Citation
+# Registry's Authority.type enum. Empty groups are omitted from output.
+groups:
+  - key: cases
+    label: "Cases"
+    types: [case]
+  - key: constitutional
+    label: "Constitutional Provisions"
+    types: [constitutional]
+  - key: statutes
+    label: "Statutes"
+    types: [statute]
+  - key: regulations
+    label: "Regulations"
+    types: [regulation]
+  - key: rules
+    label: "Rules"
+    types: [rule]
+  - key: other
+    label: "Other Authorities"
+    types: [secondary]
+
+sort:
+  # Within each group: alphabetical by the registry's sort_key.
+  within_group: sort_key
+
+passim:
+  # An authority cited on MORE than threshold_pages distinct pages
+  # renders as "passim" instead of a page list. Exactly threshold_pages
+  # lists pages (the D5 boundary in the dirty fixture; the Carmody
+  # boundary in the clean fixture).
+  threshold_pages: 5
+  render_text: "passim"
+
+formatting:
+  dot_leader: true
+  page_numbers_right_aligned: true
+  italicize_case_names: true
+  pincites_in_toa: false   # TOA lists pages of the brief, not pincites
+
+empty_groups: omit

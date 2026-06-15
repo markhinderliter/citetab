@@ -15,7 +15,7 @@ import docx
 import pytest
 from click.testing import CliRunner
 
-from toatool.cli import main
+from citetab.cli import main
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 

@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine.profile_loader import (
+from citetab.engine.profile_loader import (
     CourtProfile,
     ProfileLoaderError,
     load_profile,

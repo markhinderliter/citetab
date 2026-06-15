@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to toatool are documented here. The format follows
+All notable changes to citetab are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project adheres
 to [Semantic Versioning](https://semver.org/).
 
@@ -25,6 +25,18 @@ output change meaning (a severity change, a passim-threshold change);
 heading variant); **patch** = documentation and clarity only.
 
 ## [Unreleased]
+
+### Changed
+
+- **Renamed the product `toatool` → `citetab`** (2026-06-15). The rename covers
+  the Python package (`src/toatool/` → `src/citetab/`), the distribution name,
+  the CLI command and `prog_name` (`toatool` → `citetab`), the LibreOffice
+  override environment variable (`TOATOOL_LIBREOFFICE` → `CITETAB_LIBREOFFICE`),
+  the engine-name stamped in the generated report header, and user-facing
+  documentation. The domain abbreviation "toa" is unchanged: the `.toa.docx` and
+  `.toa-report.md` output suffixes, the `rules/toa/` path, the TT-001–TT-009 rule
+  IDs, and "Table of Authorities" all stay. Historical v0.1.0/v0.1.1 entries
+  below are left as the factual record of what shipped under the old name.
 
 ### Added
 

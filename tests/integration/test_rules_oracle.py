@@ -22,11 +22,11 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine.profile_loader import CourtProfile, load_profile_by_id
-from toatool.engine.runner import RuleRunResult, run_rules
-from toatool.models.finding import Finding
-from toatool.pipeline import convergence
-from toatool.pipeline.convergence import GenerationResult
+from citetab.engine.profile_loader import CourtProfile, load_profile_by_id
+from citetab.engine.runner import RuleRunResult, run_rules
+from citetab.models.finding import Finding
+from citetab.pipeline import convergence
+from citetab.pipeline.convergence import GenerationResult
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 

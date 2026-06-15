@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# check.sh — the single quality gate for toatool.
+# check.sh — the single quality gate for citetab.
 #
 # Runs, in order, the four checks that must pass before any PR is merged:
 #

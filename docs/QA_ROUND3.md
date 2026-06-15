@@ -45,7 +45,7 @@ outcome — an uncaught exception / Python traceback — is always a failure.
 
 Confirm unreadable inputs are rejected cleanly. The parser already validates
 `is_file()` and wraps `docx.Document()` in `except Exception → ParserError`
-([parser.py](../src/toatool/pipeline/parser.py)), which the CLI turns into
+([parser.py](../src/citetab/pipeline/parser.py)), which the CLI turns into
 exit 2 — so most of these are expected green; the round is verifying that and
 checking the **message quality** (a paralegal must understand it).
 
@@ -127,7 +127,7 @@ refusing it outright is the wrong trade. This is the substance of BL-3.
   harness called `convergence.generate()` directly, which is right for
   inspecting findings — but an uncaught `ConvergenceError` would crash the
   *harness*, not be recorded. To observe what a *user* gets, Round 3 invokes
-  `toatool generate <file>` and captures `(exit_code, stdout, stderr,
+  `citetab generate <file>` and captures `(exit_code, stdout, stderr,
   files-written)`. **A traceback in stderr is an automatic FAIL.**
 - **A `scripts/qa_round3.py` harness** in two parts: (1) a rejection suite that
   generates the Category-1 inputs and asserts exit 2 + one-line stderr +
