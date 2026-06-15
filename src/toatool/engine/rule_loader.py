@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 from datetime import date
-from pathlib import Path
+from importlib.resources.abc import Traversable
 from typing import Literal
 
 import yaml
@@ -131,11 +131,11 @@ def _split_frontmatter(text: str, source: str) -> str:
     raise RuleLoaderError(f"rule card '{source}' has an unterminated frontmatter block")
 
 
-def load_rule_card(path: Path) -> RuleCard:
+def load_rule_card(path: Traversable) -> RuleCard:
     """Load and validate a single rule card.
 
     Args:
-        path: Path to the ``TT-*.md`` card file.
+        path: The ``TT-*.md`` card file (a Traversable or ``pathlib.Path``).
 
     Returns:
         The validated :class:`RuleCard`.
@@ -171,7 +171,7 @@ def load_rule_card(path: Path) -> RuleCard:
 
 
 def load_rule_cards(
-    rules_root: Path | None = None, domain: str = "toa"
+    rules_root: Traversable | None = None, domain: str = "toa"
 ) -> dict[str, RuleCard]:
     """Load every rule card in a pack, keyed by rule id.
 
@@ -192,7 +192,10 @@ def load_rule_cards(
     if not pack_dir.is_dir():
         raise RuleLoaderError(f"rule pack directory '{pack_dir}' does not exist")
 
-    paths = sorted(pack_dir.glob("*.md"))
+    paths = sorted(
+        (entry for entry in pack_dir.iterdir() if entry.name.endswith(".md")),
+        key=lambda entry: entry.name,
+    )
     if not paths:
         raise RuleLoaderError(f"rule pack '{pack_dir}' contains no rule cards")
 

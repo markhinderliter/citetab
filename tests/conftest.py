@@ -26,9 +26,13 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-RULES_DIR = REPO_ROOT / "rules"
-PROFILES_DIR = REPO_ROOT / "profiles"
-SCHEMAS_DIR = REPO_ROOT / "schemas"
+# Versioned data is the single source of truth under the package, not the repo
+# root (see src/toatool/engine/resources.py). In a source checkout these are
+# concrete filesystem paths.
+_BUNDLED = REPO_ROOT / "src" / "toatool" / "_bundled"
+RULES_DIR = _BUNDLED / "rules"
+PROFILES_DIR = _BUNDLED / "profiles"
+SCHEMAS_DIR = _BUNDLED / "schemas"
 EXAMPLE_BRIEFS = REPO_ROOT / "examples" / "briefs"
 
 #: Run-scoped fields masked before comparing serialized findings / reports to

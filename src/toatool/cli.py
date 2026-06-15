@@ -167,7 +167,15 @@ def rules_show(rule_id: str) -> None:
     cards = load_rule_cards()
     if rule_id not in cards:
         _fail(f"no rule '{rule_id}' in the active pack")
-    matches = sorted((rules_dir() / "toa").glob(f"{rule_id}-*.md"))
+    prefix = f"{rule_id}-"
+    matches = sorted(
+        (
+            entry
+            for entry in (rules_dir() / "toa").iterdir()
+            if entry.name.startswith(prefix) and entry.name.endswith(".md")
+        ),
+        key=lambda entry: entry.name,
+    )
     if not matches:  # pragma: no cover - defensive
         _fail(f"rule card file for '{rule_id}' not found")
     click.echo(matches[0].read_text(encoding="utf-8"))
@@ -181,9 +189,12 @@ def profiles() -> None:
 @profiles.command("list")
 def profiles_list() -> None:
     """List the available court profiles."""
-    for path in sorted(profiles_dir().glob("*.yaml")):
+    names = sorted(
+        entry.name for entry in profiles_dir().iterdir() if entry.name.endswith(".yaml")
+    )
+    for name in names:
         try:
-            profile = load_profile_by_id(path.stem)
+            profile = load_profile_by_id(name.removesuffix(".yaml"))
         except ProfileLoaderError:  # pragma: no cover - defensive
             continue
         click.echo(f"{profile.id}  {profile.version}  {profile.description.strip()}")

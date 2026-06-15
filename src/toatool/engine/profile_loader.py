@@ -13,7 +13,7 @@ loudly — naming the file — when the data does not match the contract.
 from __future__ import annotations
 
 from datetime import date
-from pathlib import Path
+from importlib.resources.abc import Traversable
 from typing import Literal
 
 import yaml
@@ -152,11 +152,11 @@ class CourtProfile(BaseModel):
         )
 
 
-def load_profile(path: Path) -> CourtProfile:
+def load_profile(path: Traversable) -> CourtProfile:
     """Load and validate a single court profile YAML file.
 
     Args:
-        path: Path to the profile ``.yaml`` file.
+        path: The profile ``.yaml`` file (a Traversable or ``pathlib.Path``).
 
     Returns:
         The validated :class:`CourtProfile`.
@@ -190,7 +190,9 @@ def load_profile(path: Path) -> CourtProfile:
         ) from exc
 
 
-def load_profile_by_id(profile_id: str, search_dir: Path | None = None) -> CourtProfile:
+def load_profile_by_id(
+    profile_id: str, search_dir: Traversable | None = None
+) -> CourtProfile:
     """Load a court profile by id from the profiles directory.
 
     Args:

@@ -69,16 +69,12 @@ Changelog = "https://github.com/markhinderliter/TOATool/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/toatool"]
-
-[tool.hatch.build.targets.wheel.force-include]
-# Bundle the versioned data so `pip install toatool` works without a
-# clone: `toatool rules list/show` reads cards, the engine loads
-# profiles and validates findings against the schema. The engine looks
-# for rules/profiles in the bundled path first, then any user-supplied
-# override path.
-"rules" = "toatool/_bundled/rules"
-"profiles" = "toatool/_bundled/profiles"
-"schemas" = "toatool/_bundled/schemas"
+# The versioned data (rules/profiles/schemas) is the single source of truth
+# under src/toatool/_bundled/ and ships as ordinary package data — included
+# automatically with the package, no force-include needed. The engine resolves
+# it via importlib.resources.files("toatool")/"_bundled", which works in a
+# source/editable checkout, an installed wheel, and a frozen app (including
+# zipimport), so a bundled installer can be built without relocating data.
 
 [tool.ruff]
 target-version = "py311"
