@@ -14,15 +14,26 @@ network access is used anywhere here.
 
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import subprocess
+import sys
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
 _RENDER_TIMEOUT_S = 120
 _FONT_ATTR_RE = re.compile(r'w:(?:ascii|hAnsi|cs)="([^"]+)"')
+
+#: Environment variable holding an explicit path to the LibreOffice executable.
+#: When set it overrides discovery; if it points at a non-executable it fails
+#: loudly rather than falling through (an explicit override that's wrong is a
+#: configuration error, not a reason to silently search elsewhere).
+_LIBREOFFICE_ENV = "TOATOOL_LIBREOFFICE"
+
+#: LibreOffice download page, surfaced when no installation can be located.
+_LIBREOFFICE_URL = "https://www.libreoffice.org/download/"
 
 
 class RenderError(Exception):
@@ -37,20 +48,73 @@ class FontSubstitution:
     substitute: str
 
 
+def _is_executable(path: str) -> bool:
+    """Return whether ``path`` is an existing, executable file.
+
+    On Windows ``os.access(..., X_OK)`` is satisfied by any existing file, which
+    is the desired behavior for ``soffice.exe``.
+    """
+    return os.path.isfile(path) and os.access(path, os.X_OK)
+
+
+def _standard_install_paths() -> tuple[str, ...]:
+    """Return the standard install locations to probe, ordered, for this OS.
+
+    The Windows LibreOffice installer does not add itself to ``PATH``, so the
+    well-known install directory is probed directly. macOS apps live under
+    ``/Applications``. Linux is intentionally empty: distro packages place
+    ``libreoffice``/``soffice`` on ``PATH``, which the fallback already covers.
+    """
+    if sys.platform == "win32":
+        return (
+            r"C:\Program Files\LibreOffice\program\soffice.exe",
+            r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
+        )
+    if sys.platform == "darwin":
+        return ("/Applications/LibreOffice.app/Contents/MacOS/soffice",)
+    return ()
+
+
 def find_libreoffice() -> str:
-    """Return the path to the LibreOffice executable.
+    """Return the path to the LibreOffice executable via ordered discovery.
+
+    Discovery order, first hit wins:
+
+    1. The ``TOATOOL_LIBREOFFICE`` environment variable. If set but not
+       executable, this raises — an explicit override that is wrong fails
+       loudly rather than silently falling through.
+    2. Standard per-OS install locations (see :func:`_standard_install_paths`).
+    3. ``PATH`` (``shutil.which`` for ``libreoffice`` then ``soffice``).
 
     Raises:
-        RenderError: If neither ``libreoffice`` nor ``soffice`` is on PATH.
+        RenderError: If the ``TOATOOL_LIBREOFFICE`` override is set but not
+            executable, or if no LibreOffice can be located by any means.
     """
-    for name in ("libreoffice", "soffice"):
-        path = shutil.which(name)
-        if path is not None:
+    override = os.environ.get(_LIBREOFFICE_ENV)
+    if override:
+        if _is_executable(override):
+            return override
+        raise RenderError(
+            f"{_LIBREOFFICE_ENV} is set to '{override}', but that is not an "
+            f"executable file. Point it at the full path of the LibreOffice "
+            f"'soffice' executable, or unset it to use automatic discovery."
+        )
+
+    for path in _standard_install_paths():
+        if _is_executable(path):
             return path
+
+    for name in ("libreoffice", "soffice"):
+        found = shutil.which(name)
+        if found is not None:
+            return found
+
     raise RenderError(
-        "LibreOffice was not found on PATH. It is a required system dependency "
-        "for measuring page numbers; install it (see the README 'System "
-        "requirements' section) and try again."
+        "LibreOffice was not found. It is a required system dependency for "
+        f"measuring page numbers. Install it from {_LIBREOFFICE_URL} (see the "
+        "README 'System requirements' section), or set the "
+        f"{_LIBREOFFICE_ENV} environment variable to the full path of the "
+        "'soffice' executable, and try again."
     )
 
 

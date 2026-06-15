@@ -48,7 +48,9 @@ def test_detect_font_substitutions_returns_list() -> None:
 
 
 def test_find_libreoffice_missing(monkeypatch: pytest.MonkeyPatch) -> None:
-    """When LibreOffice is absent, discovery fails with an actionable message."""
+    """When LibreOffice is absent everywhere, discovery fails actionably."""
+    monkeypatch.delenv("TOATOOL_LIBREOFFICE", raising=False)
+    monkeypatch.setattr(renderer, "_standard_install_paths", lambda: ())
     monkeypatch.setattr(renderer.shutil, "which", lambda _name: None)
     with pytest.raises(renderer.RenderError, match="LibreOffice was not found"):
         renderer.find_libreoffice()
