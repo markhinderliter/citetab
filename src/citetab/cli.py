@@ -65,8 +65,11 @@ def generate(
     if result.outcome is Outcome.FAILED:
         _fail(result.error or "could not process the input")
 
-    # result.report_path is set on every non-FAILED outcome.
+    # result.report_path / profile fields are set on every non-FAILED outcome.
     assert result.report_path is not None
+    # Disclose the applied court format up front (not just in the report file) —
+    # a legal tool should surface which court profile it applied.
+    click.echo(f"profile: {result.profile_id} (v{result.profile_version})")
     if result.docx_path is None:
         click.echo("output: .docx SUPPRESSED (no placement found); report written")
     else:
