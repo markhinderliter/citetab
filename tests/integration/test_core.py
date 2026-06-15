@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from citetab.core import Outcome, run_generation
+from citetab.engine.profile_loader import load_profile_by_id
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 
@@ -44,6 +45,12 @@ def test_core_clean_is_success_with_both_files(tmp_path: Path) -> None:
     assert result.report_path is not None and result.report_path.is_file()
     # The message names the output folder so the user can find the results.
     assert str(result.output_dir) in result.message
+    # The applied court profile is disclosed, from the same source the report
+    # header stamps (never a hardcoded string).
+    expected_version = load_profile_by_id("frap").version
+    assert result.profile_id == "frap"
+    assert result.profile_version == expected_version
+    assert "frap" in result.message
 
 
 def test_core_non_docx_is_failed_no_files(tmp_path: Path) -> None:
@@ -61,6 +68,9 @@ def test_core_non_docx_is_failed_no_files(tmp_path: Path) -> None:
     # Nothing was written next to the input.
     assert not (tmp_path / "not_really.toa.docx").exists()
     assert not list(tmp_path.glob("*.toa-report.md"))
+    # No format was applied, so none is disclosed.
+    assert result.profile_id is None
+    assert result.profile_version is None
 
 
 @_NEEDS_RENDER
@@ -79,3 +89,7 @@ def test_core_suppressed_is_issues_without_docx(memo_no_marker: Path) -> None:
     # Honest message: the report is named, the (absent) .docx is NOT promised.
     assert result.report_path.name in result.message
     assert ".toa.docx" not in result.message
+    # The applied court profile is still disclosed on the issues path.
+    assert result.profile_id == "frap"
+    assert result.profile_version == load_profile_by_id("frap").version
+    assert "frap" in result.message

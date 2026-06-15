@@ -59,6 +59,8 @@ class GenerationOutcome:
     warning_count: int
     info_count: int
     message: str
+    profile_id: str | None = None
+    profile_version: str | None = None
     error: str | None = None
 
 
@@ -128,12 +130,19 @@ def _success_message(
     docx_path: Path | None,
     report_path: Path,
     rules: RuleRunResult,
+    profile: CourtProfile,
 ) -> str:
-    """Build the GUI-facing message, naming the folder and only files written."""
+    """Build the GUI-facing message, naming the folder and only files written.
+
+    Discloses the applied court profile (a legal tool must never apply a court
+    format silently). The profile id/version come from the same ``CourtProfile``
+    the report header stamps — not a parallel lookup or a literal.
+    """
     counts = (
         f"Findings: {rules.error_count} error · "
         f"{rules.warning_count} warning · {rules.info_count} info"
     )
+    applied = f"Applied court profile: {profile.id} (v{profile.version})"
     lines: list[str]
     if outcome is Outcome.SUCCESS:
         lines = ["Done. Your new files are in:", "", str(output_dir), ""]
@@ -161,7 +170,7 @@ def _success_message(
     if docx_path is not None:
         lines.append(f"• regenerated brief: {docx_path.name}")
     lines.append(f"• findings report: {report_path.name}")
-    lines += ["", counts]
+    lines += ["", applied, counts]
     return "\n".join(lines)
 
 
@@ -216,6 +225,7 @@ def run_generation(
         docx_path=written_docx,
         report_path=report_path,
         rules=rules,
+        profile=profile,
     )
     return GenerationOutcome(
         outcome=outcome,
@@ -227,4 +237,6 @@ def run_generation(
         warning_count=rules.warning_count,
         info_count=rules.info_count,
         message=message,
+        profile_id=profile.id,
+        profile_version=profile.version,
     )
