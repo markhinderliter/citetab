@@ -21,20 +21,10 @@ from typing import NoReturn
 import click
 
 from citetab import __version__
-from citetab.engine.profile_loader import (
-    CourtProfile,
-    ProfileLoaderError,
-    load_profile_by_id,
-)
+from citetab.core import Outcome, run_generation
+from citetab.engine.profile_loader import ProfileLoaderError, load_profile_by_id
 from citetab.engine.resources import profiles_dir, rules_dir
 from citetab.engine.rule_loader import load_rule_cards
-from citetab.engine.runner import RuleRunResult, run_rules
-from citetab.pipeline import convergence
-from citetab.pipeline.convergence import GenerationResult
-from citetab.pipeline.extractor import EmptyDocumentError
-from citetab.pipeline.parser import ParserError
-from citetab.pipeline.renderer import RenderError
-from citetab.report import render_report
 
 EXIT_OK = 0
 EXIT_FINDINGS = 1
@@ -45,49 +35,6 @@ def _fail(message: str) -> NoReturn:
     """Print an error and exit ``2`` (invocation/parse failure)."""
     click.echo(f"error: {message}", err=True)
     raise SystemExit(EXIT_INVOCATION)
-
-
-def _report_path(docx_path: Path) -> Path:
-    """Return the report path tracking the ``.docx`` stem (REPORT_SPEC §1)."""
-    name = docx_path.name
-    base = name[: -len(".toa.docx")] if name.endswith(".toa.docx") else docx_path.stem
-    return docx_path.with_name(f"{base}.toa-report.md")
-
-
-def _output_paths(input_path: Path, output: Path | None) -> tuple[Path, Path]:
-    """Resolve the ``.docx`` and report output paths for a run."""
-    docx_path = (
-        output
-        if output is not None
-        else input_path.with_name(f"{input_path.stem}.toa.docx")
-    )
-    return docx_path, _report_path(docx_path)
-
-
-def _write_outputs(
-    gen: GenerationResult,
-    rules: RuleRunResult,
-    *,
-    input_path: Path,
-    profile: CourtProfile,
-    docx_path: Path,
-    report_path: Path,
-) -> None:
-    """Write the ``.docx`` (unless suppressed) and the Markdown report."""
-    if rules.docx_suppressed:
-        output_clause = "SUPPRESSED — no placement found"
-    else:
-        gen.working_document.save(str(docx_path))
-        output_clause = f"written {docx_path.name}"
-
-    report = render_report(
-        gen,
-        rules,
-        input_name=input_path.name,
-        profile=profile,
-        output_clause=output_clause,
-    )
-    report_path.write_text(report, encoding="utf-8")
 
 
 @click.group()
@@ -113,37 +60,23 @@ def generate(
     output: Path | None,
 ) -> None:
     """Regenerate BRIEF's Table of Authorities and write a findings report."""
-    try:
-        profile = load_profile_by_id(court)
-    except ProfileLoaderError as exc:
-        _fail(str(exc))
+    result = run_generation(brief, court=court, toa_heading=toa_heading, output=output)
 
-    try:
-        gen = convergence.generate(brief, profile, toa_heading=toa_heading)
-    except (ParserError, RenderError, EmptyDocumentError) as exc:
-        _fail(str(exc))
+    if result.outcome is Outcome.FAILED:
+        _fail(result.error or "could not process the input")
 
-    rules = run_rules(gen, input_path=brief, profile=profile)
-    docx_path, report_path = _output_paths(brief, output)
-    _write_outputs(
-        gen,
-        rules,
-        input_path=brief,
-        profile=profile,
-        docx_path=docx_path,
-        report_path=report_path,
-    )
-
-    if rules.docx_suppressed:
+    # result.report_path is set on every non-FAILED outcome.
+    assert result.report_path is not None
+    if result.docx_path is None:
         click.echo("output: .docx SUPPRESSED (no placement found); report written")
     else:
-        click.echo(f"output: {docx_path.name}")
-    click.echo(f"report: {report_path.name}")
+        click.echo(f"output: {result.docx_path.name}")
+    click.echo(f"report: {result.report_path.name}")
     click.echo(
-        f"findings: {rules.error_count} error · {rules.warning_count} warning · "
-        f"{rules.info_count} info"
+        f"findings: {result.error_count} error · {result.warning_count} warning · "
+        f"{result.info_count} info"
     )
-    raise SystemExit(rules.exit_code)
+    raise SystemExit(result.exit_code)
 
 
 @main.group()
