@@ -14,9 +14,14 @@
 # Every check runs even if an earlier one fails, so one invocation surfaces the
 # full picture; the script exits non-zero if any check failed.
 #
-# LibreOffice-dependent tests skip automatically when LibreOffice is absent
-# (they are marked skipif), so this runs on a machine without it — but the
-# render-backed integration tests only truly exercise on a machine that has it.
+# One deliberate local-vs-CI difference: tests marked @pytest.mark.calibrated
+# assert specific measured page numbers / pagination-derived finding sets that
+# only hold on the fixture-generating machine. They RUN LOCALLY (the real
+# verification) but skip automatically under CI (the conftest hook keys on the
+# CI env var) because a foreign runner's LibreOffice/fonts paginate differently.
+# So: locally this script is the full gate; in CI the calibrated subset is
+# deselected. LibreOffice-dependent tests also skip when LibreOffice is absent
+# (marked skipif) — the portable render-backed tests still exercise it in CI.
 #
 # Usage:  ./scripts/check.sh           (run from anywhere; cd's to repo root)
 #         Activate your virtualenv first, or ensure ruff/mypy/pytest are on PATH.

@@ -30,10 +30,16 @@ from citetab.pipeline.convergence import GenerationResult
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 
-pytestmark = pytest.mark.skipif(
-    shutil.which("libreoffice") is None and shutil.which("soffice") is None,
-    reason="LibreOffice is required to render; not installed",
-)
+# The §20 oracle asserts exact render-derived finding sets per fixture, so the
+# whole suite is calibration-dependent (skipped under CI; run locally). It also
+# needs LibreOffice to render.
+pytestmark = [
+    pytest.mark.skipif(
+        shutil.which("libreoffice") is None and shutil.which("soffice") is None,
+        reason="LibreOffice is required to render; not installed",
+    ),
+    pytest.mark.calibrated,
+]
 
 
 @pytest.fixture(scope="module")

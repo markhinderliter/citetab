@@ -15,6 +15,7 @@ this phase it provides:
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from collections.abc import Callable
 from pathlib import Path
@@ -24,6 +25,29 @@ import docx
 import pytest
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+
+
+def pytest_collection_modifyitems(
+    config: pytest.Config, items: list[pytest.Item]
+) -> None:
+    """Skip ``@pytest.mark.calibrated`` tests when running under CI.
+
+    Calibration-dependent tests assert specific measured page numbers or
+    pagination-derived finding sets, which only hold on the machine that
+    generated the fixtures (the local render calibration). On a foreign CI
+    runner — different LibreOffice version and fonts — they diverge, so they are
+    deselected when ``CI`` is set (GitHub Actions sets it automatically). Locally
+    (no ``CI``) they run: they are the real verification.
+    """
+    if not os.environ.get("CI"):
+        return
+    skip_calibrated = pytest.mark.skip(
+        reason="calibration-dependent (render-specific); runs locally, not in CI"
+    )
+    for item in items:
+        if "calibrated" in item.keywords:
+            item.add_marker(skip_calibrated)
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 # Versioned data is the single source of truth under the package, not the repo
