@@ -1,25 +1,51 @@
 """Double-click GUI shell for citetab — a thin Tk front end over the shared core.
 
-When the frozen app is launched with no file argument, ``main()`` opens a native
-"open file" dialog filtered to ``.docx``, runs the same generation the CLI does
-(:func:`citetab.core.run_generation`), and shows the result in a dialog. There is
-no console in the frozen app, so all feedback is via ``tkinter.messagebox``; a
-cancelled dialog exits cleanly with no error.
+``main()`` has two paths over the same generation core:
 
-Tkinter is part of the standard library and is imported lazily inside ``main()``
-— never at module import — so this module imports safely on a headless machine
-(no display, or no Tk installed). Run in development with ``python -m citetab.app``.
+- **No file argument** (a double-click): open a native "open file" dialog filtered
+  to ``.docx``, run the generation, and show the result via ``tkinter.messagebox``
+  — there is no console in the frozen app, so all GUI feedback is a dialog; a
+  cancelled dialog exits cleanly with no error.
+- **A file-path argument** (drag-a-brief-onto-the-icon, or ``citetab brief.docx``):
+  run the generation headlessly and report on stdout/stderr using the same fields
+  the CLI prints, returning the outcome's exit code. This path never touches Tk.
+
+Tkinter is imported lazily inside the dialog path — never at module import and
+never on the file-arg path — so this module imports safely with no display and
+the frozen bundle can be self-verified headlessly. Run in development with
+``python -m citetab.app`` (dialog) or ``python -m citetab.app <brief.docx>``.
 """
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
-from citetab.core import Outcome, run_generation
+from citetab.core import GenerationOutcome, Outcome, run_generation
 
 
-def main() -> None:
-    """Open a file picker, run generation on the choice, and show the result."""
+def _report_stdout(result: GenerationOutcome) -> int:
+    """Print the CLI-style disclosure for a headless run and return its exit code."""
+    if result.outcome is Outcome.FAILED:
+        print(f"error: {result.error}", file=sys.stderr)
+        return result.exit_code
+
+    assert result.report_path is not None  # set on every non-FAILED outcome
+    print(f"profile: {result.profile_id} (v{result.profile_version})")
+    if result.docx_path is None:
+        print("output: .docx SUPPRESSED (no placement found); report written")
+    else:
+        print(f"output: {result.docx_path.name}")
+    print(f"report: {result.report_path.name}")
+    print(
+        f"findings: {result.error_count} error · {result.warning_count} warning · "
+        f"{result.info_count} info"
+    )
+    return result.exit_code
+
+
+def _run_dialog() -> int:
+    """Open the file picker, run generation on the choice, and show the result."""
     import tkinter as tk
     from tkinter import filedialog, messagebox
 
@@ -31,7 +57,7 @@ def main() -> None:
             filetypes=[("Word briefs", "*.docx")],
         )
         if not selected:
-            return  # cancelled — exit quietly, no dialog
+            return 0  # cancelled — exit quietly, no dialog
 
         result = run_generation(Path(selected))
         show = {
@@ -40,9 +66,28 @@ def main() -> None:
             Outcome.FAILED: messagebox.showerror,
         }[result.outcome]
         show("citetab", result.message)
+        return result.exit_code
     finally:
         root.destroy()
 
 
-if __name__ == "__main__":  # pragma: no cover - manual GUI entry point
-    main()
+def main(argv: list[str] | None = None) -> int:
+    """Run the picker (no argument) or process a given brief headlessly.
+
+    Args:
+        argv: Arguments after the program name; defaults to ``sys.argv[1:]``. The
+            first entry, if present, is treated as the brief path (headless run);
+            no entry opens the file dialog.
+
+    Returns:
+        The process exit code (the generation outcome's, or 0 on a cancelled
+        dialog).
+    """
+    args = sys.argv[1:] if argv is None else argv
+    if args:
+        return _report_stdout(run_generation(Path(args[0])))
+    return _run_dialog()
+
+
+if __name__ == "__main__":  # pragma: no cover - manual entry point
+    raise SystemExit(main())
