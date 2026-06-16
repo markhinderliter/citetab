@@ -1,8 +1,8 @@
-# toatool Project Launch / Control Document
+# citetab Project Launch / Control Document
 
 ## 1. Project Name
 
-**toatool** (working name)
+**citetab** (working name)
 
 The placeholder is deliberate. The real name is decided at v0.5 launch
 prep; candidate names from the design phase (Cantica, Cantique) remain
@@ -55,7 +55,7 @@ is an excellent open-source citation parser, but nothing sits above it
 as a TOA *generator* that takes a .docx, measures real page locations,
 and writes the table back.
 
-**toatool exists to be that missing layer.**
+**citetab exists to be that missing layer.**
 
 Positioning, verbatim: *"The free local alternative to ezBriefs and
 TypeLaw, because your client's brief shouldn't have to live on someone
@@ -74,12 +74,12 @@ CallLint: spec-first design, versioned rule definitions, deterministic
 logic, structured findings, local-first by default, AI-assisted
 implementation against human-ratified specifications.
 
-Where CallLint demonstrated the pattern once, toatool demonstrates that
+Where CallLint demonstrated the pattern once, citetab demonstrates that
 the pattern is *portable* — roughly 70% of the CallLint design package
 transferred directly (finding/severity/confidence semantics, versioning
 policy, rule-card format, guardrails for AI-assisted development,
 liability posture), while the remaining 30% required a genuinely
-different architectural decision: toatool is a generator, not a linter,
+different architectural decision: citetab is a generator, not a linter,
 and the design package documents how the pattern bends to accommodate
 that without breaking.
 
@@ -137,7 +137,7 @@ table can change the pagination it reports. Solving that honestly
 
 ## 7. Solution Statement
 
-toatool ingests a .docx brief and:
+citetab ingests a .docx brief and:
 
 1. **Parses** the document (python-docx) and **extracts** every
    citation in every form — full, short, *supra*, *id.*, *ibid.* —
@@ -158,7 +158,7 @@ toatool ingests a .docx brief and:
    follows with findings
 
 Everything runs locally. No network calls during a run, no telemetry,
-no LLM calls at generation time. Running toatool on its own output
+no LLM calls at generation time. Running citetab on its own output
 converges immediately with zero changes — idempotency is both the
 product promise and a built-in self-test.
 
@@ -172,7 +172,7 @@ them.
 ### 8.1 Generator first; findings are disclosures
 
 This is the load-bearing difference from CallLint. CallLint was a
-linter: rules *were* the product. toatool's product is the regenerated
+linter: rules *were* the product. citetab's product is the regenerated
 TOA; findings exist to make the tool's corrections and caveats
 unmissable. Severity therefore answers the question *"what must the
 user do before filing?"* — not "how bad is the violation":
@@ -451,11 +451,11 @@ exactly.
 Single brief per invocation. Click-based:
 
 ```
-toatool generate BRIEF.docx [--court PROFILE] [--toa-heading TEXT] [--output PATH]
-toatool rules list
-toatool rules show TT-001
-toatool profiles list
-toatool profiles show frap
+citetab generate BRIEF.docx [--court PROFILE] [--toa-heading TEXT] [--output PATH]
+citetab rules list
+citetab rules show TT-001
+citetab profiles list
+citetab profiles show frap
 ```
 
 Exit codes: 0 = success (info/warning findings allowed); 1 = error
@@ -469,7 +469,7 @@ verified per fixture in the end-to-end tests.
 ### FR-12: Idempotency
 *Source: INPUT_OUTPUT_SPEC.md §3.3*
 
-Same input → same output, every run. Running toatool on its own output
+Same input → same output, every run. Running citetab on its own output
 converges immediately with zero changes. The marker-to-heading handoff
 preserves this: a marker bootstraps placement exactly once; the
 generated TOA carries the standard heading, so re-runs detect via the
@@ -542,14 +542,14 @@ rules: there is no data-processing relationship to paper.
 it. Add `pdfplumber>=0.11` as the first build-phase commit touching
 pyproject. Everything else in the Step E pyproject stands, including
 the bundled-data wheel configuration (rules, profiles, and schemas ship
-inside the wheel so `pip install toatool` works without a clone).
+inside the wheel so `pip install citetab` works without a clone).
 
 ## 15. Proposed Architecture
 
 ### Repository layout
 
 ```
-toatool/                                ← repo root
+citetab/                                ← repo root
 ├── README.md                           ← Step E
 ├── LIABILITY.md                        ← Step E
 ├── LICENSE                             ← Step E (MIT + additional notice)
@@ -585,7 +585,7 @@ toatool/                                ← repo root
 │   ├── finding.schema.json             ← Step D
 │   └── registry.schema.json            ← generated during build (spec §4)
 │
-├── src/toatool/
+├── src/citetab/
 │   ├── models/                         ← finding.py (Step D), registry.py (build)
 │   ├── pipeline/                       ← parser, extractor, resolver, toa_builder,
 │   │                                      inserter, renderer, locator, convergence,
@@ -662,7 +662,7 @@ Step D finding schema; this section is orientation, not redefinition.
 One happy path, three commands of introspection:
 
 ```
-$ toatool generate opposition.docx
+$ citetab generate opposition.docx
 Parsed 41 citation occurrences → 12 authorities (frap profile v1.0.0)
 Placement: heading "TABLE OF AUTHORITIES" (page 1)
 Converged in 2 iterations.
@@ -680,8 +680,8 @@ teaching-artifact property carried over from CallLint.
 
 ## 18. Distribution
 
-- **PyPI** as `toatool` (rename at v0.5 will publish under the real
-  name with `toatool` kept as a final redirect release)
+- **PyPI** as `citetab` (rename at v0.5 will publish under the real
+  name with `citetab` kept as a final redirect release)
 - **GitHub** public repo from the first commit; the seed files are
   committed *before* Claude Code runs, so history shows the
   design/build boundary
@@ -693,9 +693,9 @@ teaching-artifact property carried over from CallLint.
 
 The MVP is complete when a user can:
 
-1. `pip install toatool` (plus LibreOffice per README) on Linux,
+1. `pip install citetab` (plus LibreOffice per README) on Linux,
    macOS, or Windows
-2. Run `toatool generate examples/briefs/clean_appellate_brief.docx`
+2. Run `citetab generate examples/briefs/clean_appellate_brief.docx`
    and get a .docx whose TOA is semantically identical to the input's,
    converged on the first check
 3. Run it against `dirty_motion_brief.docx` and get a corrected TOA
@@ -707,7 +707,7 @@ The MVP is complete when a user can:
 5. Open any report and understand every finding: what fired, why,
    with what evidence, citing which authority (FRAP, Bluebook, or
    spec section)
-6. Run `toatool rules list` / `rules show` / `profiles show frap`
+6. Run `citetab rules list` / `rules show` / `profiles show frap`
 7. Verify by reading LIABILITY.md that the tool's posture is clear:
    drafts for attorney review, not legal advice, filing attorney
    responsible for every filing
@@ -826,7 +826,7 @@ checks, summarize, wait for approval. If Claude Code barrels through a
 gate, stop it and remind it.
 
 ```text
-Create a new Python project called toatool.
+Create a new Python project called citetab.
 
 docs/PRD.md is the control document. The seed files are already in
 place and committed:
@@ -839,7 +839,7 @@ place and committed:
   rule cards)
 - profiles/frap.yaml
 - schemas/finding.schema.json
-- src/toatool/models/finding.py (Pydantic model, from the design phase)
+- src/citetab/models/finding.py (Pydantic model, from the design phase)
 - examples/briefs/ (clean_appellate_brief.docx, dirty_motion_brief.docx,
   marker_trial_memo.docx) and examples/reports/ (three rendered
   Markdown reports)
@@ -857,7 +857,7 @@ If anything in the seed files seems contradictory, list it here. STOP.
 
 PHASE 1 — Models, schemas, loaders. Add pdfplumber>=0.11 to
 pyproject dependencies (PRD §14 correction). Implement
-schemas/registry.schema.json and src/toatool/models/registry.py per
+schemas/registry.schema.json and src/citetab/models/registry.py per
 INPUT_OUTPUT_SPEC §4, cross-validating both ways. Implement the rule
 loader (parse card frontmatter, validate an implementation exists for
 every active card, fail loudly on drift) and the profile loader
@@ -920,16 +920,16 @@ Constraints (from docs/AI_GUARDRAILS.md) — non-negotiable:
 The design files were produced across several sessions, and the
 review-project copies of some Step D/E files were shadowed by
 identically named CallLint reference files. Before handing off,
-confirm the seed folder physically contains the **toatool** versions
+confirm the seed folder physically contains the **citetab** versions
 of: README.md, LIABILITY.md, AI_GUARDRAILS.md, docs/REPORT_SPEC.md,
-schemas/finding.schema.json, src/toatool/models/finding.py, and the
-three rendered example reports. A CallLint README in a toatool repo is
+schemas/finding.schema.json, src/citetab/models/finding.py, and the
+three rendered example reports. A CallLint README in a citetab repo is
 the kind of error that survives to launch. The Step G handoff document
 includes this checklist.
 
 ## 23. Suggested LinkedIn / Portfolio Summary
 
-> Built toatool, a free, open-source, local-first Table of Authorities
+> Built citetab, a free, open-source, local-first Table of Authorities
 > generator for legal briefs. A .docx goes in; a copy with a
 > court-rule-compliant TOA comes out, page numbers measured from a
 > real render of the actual document via a fixed-point pagination
@@ -958,7 +958,7 @@ Post-v1, in rough priority order — none committed:
 5. **Quotation accuracy** — gated on resolving the local-first tension
    (it requires source corpora), not just on effort.
 6. **The rename** at v0.5: real name, PyPI publication under it, repo
-   rename, `toatool` redirect release.
+   rename, `citetab` redirect release.
 
 ## 25. Risks and Mitigations
 
@@ -999,13 +999,13 @@ notice are unambiguous — drafts for attorney review, filing attorney
 responsible for every filing; the findings system exists so the tool
 never makes a silent claim; MIT's warranty disclaimer applies.
 
-**Placeholder-name drift.** Shipping momentum could make "toatool"
+**Placeholder-name drift.** Shipping momentum could make "citetab"
 permanent by default. *Mitigation:* the v0.5 gate is written into
 this document and the custom instructions; §1 bounds the rename cost.
 
 ## 26. Project Identity
 
-- **Name:** toatool (placeholder; real name at v0.5 launch prep —
+- **Name:** citetab (placeholder; real name at v0.5 launch prep —
   shortlist held, no further naming discussion before then)
 - **License:** MIT, plus the non-license additional notice pointing at
   LIABILITY.md

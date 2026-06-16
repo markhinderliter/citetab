@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from toatool.engine.profile_loader import load_profile_by_id
-from toatool.pipeline import toa_builder
-from toatool.pipeline.working import WorkingAuthority, WorkingOccurrence
+from citetab.engine.profile_loader import load_profile_by_id
+from citetab.pipeline import toa_builder
+from citetab.pipeline.working import WorkingAuthority, WorkingOccurrence
 
 
 def _authority(

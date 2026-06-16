@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/markhinderliter/TOATool/blob/main/schemas/registry.schema.json",
+  "title": "CitationRegistry",
+  "description": "The canonical internal data model citetab produces for one run, per docs/INPUT_OUTPUT_SPEC.md section 4. Every output (the regenerated .docx TOA and the Markdown report) is a rendering of this structure. It pairs with src/citetab/models/registry.py, which mirrors it field for field; tests cross-validate the two in both directions. Occurrence.page is nullable here (deviating from spec section 4.2's [req] marker) so a partial registry can represent an occurrence not yet located by a render; a converged registry populates every page.",
+  "type": "object",
+  "required": ["authorities", "run_metadata"],
+  "additionalProperties": false,
+  "properties": {
+    "authorities": {
+      "type": "array",
+      "description": "Every resolved authority in the brief. May be empty for a brief that cites nothing.",
+      "items": { "$ref": "#/$defs/authority" }
+    },
+    "run_metadata": { "$ref": "#/$defs/run_metadata" }
+  },
+  "$defs": {
+    "occurrence": {
+      "type": "object",
+      "description": "A single reference to an authority in the brief body, in any form.",
+      "required": ["form", "raw_text", "paragraph_index", "char_span", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "form": {
+          "type": "string",
+          "enum": ["full", "short", "supra", "id", "ibid"],
+          "description": "Citation form, as classified by eyecite resolution."
+        },
+        "raw_text": {
+          "type": "string",
+          "description": "Verbatim text of the occurrence as it appears in the brief."
+        },
+        "paragraph_index": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index of the paragraph in the .docx body where the occurrence appears."
+        },
+        "char_span": {
+          "type": "array",
+          "description": "Inclusive-exclusive character offsets [start, end) within the paragraph.",
+          "items": { "type": "integer", "minimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium"],
+          "description": "high = exact text-span match in the render; medium = approximated location."
+        },
+        "page": {
+          "type": ["integer", "null"],
+          "minimum": 1,
+          "description": "Page in the converged render, or null before a render has located the occurrence."
+        },
+        "pincite": {
+          "type": ["string", "null"],
+          "description": "Pinpoint reference within the cited authority, or null when absent."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "description": "One resolved authority and every occurrence that refers to it.",
+      "required": [
+        "authority_id",
+        "type",
+        "components",
+        "display_full",
+        "sort_key",
+        "group",
+        "occurrences",
+        "pages",
+        "passim"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "authority_id": {
+          "type": "string",
+          "description": "Stable-within-a-run identifier, deterministically derived from the authority."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["case", "statute", "regulation", "constitutional", "rule", "secondary"],
+          "description": "The kind of authority; drives the TOA group via the profile's types map."
+        },
+        "components": {
+          "type": "object",
+          "description": "Normalized parts of the citation (reporter/volume/page/court/year, or code/section, etc.).",
+          "additionalProperties": true
+        },
+        "display_full": {
+          "type": "string",
+          "description": "Full citation form as rendered in the TOA."
+        },
+        "sort_key": {
+          "type": "string",
+          "description": "Within-group alphabetical ordering key."
+        },
+        "group": {
+          "type": "string",
+          "enum": ["cases", "constitutional", "statutes", "regulations", "rules", "other"],
+          "description": "TOA grouping bucket, per the active court profile."
+        },
+        "occurrences": {
+          "type": "array",
+          "description": "Every reference to this authority, in every form.",
+          "items": { "$ref": "#/$defs/occurrence" }
+        },
+        "pages": {
+          "type": "array",
+          "description": "Sorted, de-duplicated brief pages where any occurrence lands.",
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "passim": {
+          "type": "boolean",
+          "description": "True when the distinct-page count exceeds the profile's passim threshold."
+        },
+        "display_short": {
+          "type": ["string", "null"],
+          "description": "Short citation form, or null when not derivable."
+        }
+      }
+    },
+    "font_substitution": {
+      "type": "object",
+      "description": "A single font the render engine substituted.",
+      "required": ["original", "substitute"],
+      "additionalProperties": false,
+      "properties": {
+        "original": {
+          "type": "string",
+          "description": "The font the document declared."
+        },
+        "substitute": {
+          "type": "string",
+          "description": "The font the render engine used in its place."
+        }
+      }
+    },
+    "run_metadata": {
+      "type": "object",
+      "description": "Run-level provenance for the whole registry, per spec section 4.3.",
+      "required": [
+        "engine_version",
+        "rule_pack_version",
+        "profile_id",
+        "profile_version",
+        "render_engine",
+        "render_engine_version",
+        "font_substitution_occurred",
+        "iteration_count",
+        "converged",
+        "input_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "engine_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "Semantic version of the citetab engine."
+        },
+        "rule_pack_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "Semantic version of the toa rule pack."
+        },
+        "profile_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Identifier of the court profile in force (e.g. frap)."
+        },
+        "profile_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "description": "Semantic version of the court profile in force."
+        },
+        "render_engine": {
+          "type": "string",
+          "description": "Render engine identity (e.g. LibreOffice)."
+        },
+        "render_engine_version": {
+          "type": "string",
+          "description": "Render engine version string (e.g. 24.2)."
+        },
+        "font_substitution_occurred": {
+          "type": "boolean",
+          "description": "Whether the render substituted any font; gates TT-008."
+        },
+        "iteration_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of convergence iterations the run took."
+        },
+        "converged": {
+          "type": "boolean",
+          "description": "Whether pagination stabilized within the cap; false gates TT-007."
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 hex digest of the input .docx, for provenance."
+        },
+        "font_substitutions": {
+          "type": "array",
+          "description": "The substitution pairs, when any occurred; empty otherwise.",
+          "items": { "$ref": "#/$defs/font_substitution" }
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-"""Shared pytest fixtures and helpers for the toatool test suite.
+"""Shared pytest fixtures and helpers for the citetab test suite.
 
 This file is the single place that documents cross-cutting test concerns. In
 this phase it provides:
@@ -26,9 +26,13 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-RULES_DIR = REPO_ROOT / "rules"
-PROFILES_DIR = REPO_ROOT / "profiles"
-SCHEMAS_DIR = REPO_ROOT / "schemas"
+# Versioned data is the single source of truth under the package, not the repo
+# root (see src/citetab/engine/resources.py). In a source checkout these are
+# concrete filesystem paths.
+_BUNDLED = REPO_ROOT / "src" / "citetab" / "_bundled"
+RULES_DIR = _BUNDLED / "rules"
+PROFILES_DIR = _BUNDLED / "profiles"
+SCHEMAS_DIR = _BUNDLED / "schemas"
 EXAMPLE_BRIEFS = REPO_ROOT / "examples" / "briefs"
 
 #: Run-scoped fields masked before comparing serialized findings / reports to
@@ -189,7 +193,7 @@ def make_parsed() -> Callable[[list[tuple[str, str]]], Any]:
     Heading level is derived from a ``Heading N`` style name. The ``document``
     field is left ``None`` (the pipeline stages under test read only paragraphs).
     """
-    from toatool.pipeline.parser import Paragraph, ParsedDocument
+    from citetab.pipeline.parser import Paragraph, ParsedDocument
 
     def _build(paras: list[tuple[str, str]]) -> Any:
         built = []

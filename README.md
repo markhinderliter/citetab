@@ -1,4 +1,4 @@
-# toatool
+# citetab
 
 > Working name. The real name is decided at the v0.5 launch.
 
@@ -13,7 +13,7 @@ box, and only then insert the table. The other "free" options are demo
 modes of cloud tools that require uploading confidential client
 documents to a vendor's servers.
 
-toatool is the option that doesn't make you choose between hundreds of
+citetab is the option that doesn't make you choose between hundreds of
 keyboard shortcuts and someone else's cloud. It runs on your machine.
 It finds the citations automatically. It generates the TOA with page
 numbers measured from a real render of your document. When you edit the
@@ -56,23 +56,23 @@ for you.
 
 ```bash
 # Install (requires Python 3.11+ and LibreOffice — see System requirements)
-pip install toatool
+pip install citetab
 
 # Generate: writes brief.toa.docx and brief.toa-report.md
-toatool generate brief.docx
+citetab generate brief.docx
 
 # Pick the court profile governing TOA format (default: frap)
-toatool generate brief.docx --court frap
+citetab generate brief.docx --court frap
 
 # See what the tool checks and discloses
-toatool rules list
-toatool rules show TT-003
+citetab rules list
+citetab rules show TT-003
 ```
 
 A run looks like this:
 
 ```
-$ toatool generate opposition.docx
+$ citetab generate opposition.docx
 Parsed 41 citation occurrences → 12 authorities (frap profile v1.0.0)
 Placement: heading "TABLE OF AUTHORITIES" (page 1)
 Converged in 2 iterations.
@@ -83,13 +83,13 @@ Wrote opposition.toa-report.md
 
 If your brief has no Table of Authorities section yet (common in trial-
 court filings), put `[[TOA]]` on its own line where the table should
-go. toatool inserts the table there and consumes the marker.
+go. citetab inserts the table there and consumes the marker.
 
 ## System requirements
 
 - **Python 3.11+**
 - **LibreOffice** (headless) — a required *system* dependency, not a
-  Python package. toatool measures page numbers by rendering your
+  Python package. citetab measures page numbers by rendering your
   document with LibreOffice, so it must be installed and on your PATH.
   The tool fails with a clear message if it can't find it.
 
@@ -110,7 +110,7 @@ winget install TheDocumentFoundation.LibreOffice
 typically set in Times New Roman, which isn't present on most Linux
 systems. LibreOffice substitutes a metric-compatible font (Liberation
 Serif), which is close but can occasionally shift a citation across a
-page boundary. When a substitution happens, toatool discloses it (rule
+page boundary. When a substitution happens, citetab discloses it (rule
 `TT-008`) so you know to double-check. Installing the real fonts removes
 the ambiguity:
 
@@ -126,7 +126,7 @@ macOS and Windows generally already have these fonts.
 A `.docx` file does not contain page numbers — pages exist only when the
 document is laid out. And because the Table of Authorities is *part of*
 the document it describes, writing the table can change the pagination
-it reports. toatool solves that honestly rather than approximately:
+it reports. citetab solves that honestly rather than approximately:
 
 1. **Parse** the document (python-docx) and **extract** every citation
    in every form — full, short, *supra*, *id.*, *ibid.* — with eyecite,
@@ -144,7 +144,7 @@ it reports. toatool solves that honestly rather than approximately:
    formatted content — never Word field codes, never modifying the
    original — plus the Markdown report.
 
-Running toatool on its own output converges immediately with zero
+Running citetab on its own output converges immediately with zero
 changes. That idempotency is both the product promise and a built-in
 self-test.
 
@@ -168,14 +168,14 @@ citation parser's recall).
 | TT-007 | Pagination non-convergence        | error    | Pagination didn't settle within the iteration cap              |
 | TT-008 | Font substitution during render   | warning  | A render font was substituted; page numbers may shift          |
 
-`toatool rules show TT-00x` prints the full rule card — its logic, the
+`citetab rules show TT-00x` prints the full rule card — its logic, the
 edge cases it knows about, and the authority (FRAP, Bluebook, or spec
 section) it cites — so you can read exactly why any finding exists.
 
 ## Project structure
 
 ```
-toatool/
+citetab/
 ├── README.md                 ← you are here
 ├── LIABILITY.md              ← explicit positioning and disclaimers
 ├── LICENSE                   ← MIT + additional notice
@@ -186,7 +186,7 @@ toatool/
 ├── rules/toa/               ← rule cards (Markdown), versioned
 ├── profiles/                 ← court profiles (YAML data, e.g. frap)
 ├── schemas/                  ← canonical JSON Schemas (registry, finding)
-├── src/toatool/             ← engine, CLI, report renderer
+├── src/citetab/             ← engine, CLI, report renderer
 ├── tests/                    ← unit + integration tests, fixtures, expected output
 └── examples/briefs/         ← synthetic example briefs
 ```
@@ -195,7 +195,7 @@ toatool/
 
 These are structural commitments, not preferences.
 
-**Generation first.** toatool's product is the regenerated table.
+**Generation first.** citetab's product is the regenerated table.
 Findings are disclosures around it — what was corrected, what to check —
 not the point of the tool.
 
@@ -240,7 +240,7 @@ positive outcome.
 
 ## Disclaimer
 
-toatool prepares a draft Table of Authorities for attorney review. It
+citetab prepares a draft Table of Authorities for attorney review. It
 performs clerical document automation — locating citations and
 formatting a table — and exercises no legal judgment. Its output is not
 legal advice, and a generated table is not a representation that the

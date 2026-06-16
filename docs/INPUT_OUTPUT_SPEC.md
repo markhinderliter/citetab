@@ -1,10 +1,10 @@
-# toatool — Input/Output Specification (Step B)
+# citetab — Input/Output Specification (Step B)
 
 **Status:** Draft for ratification
 **Version:** 0.1.0-draft
-**Project name:** toatool (placeholder; real name decided at v0.5 launch)
+**Project name:** citetab (placeholder; real name decided at v0.5 launch)
 
-This document is the normative specification for what toatool accepts,
+This document is the normative specification for what citetab accepts,
 what it produces, and the internal data structure that connects them.
 It is the design-phase equivalent of a schema-first contract: the
 Citation Registry defined in Section 4 is the canonical structure, and
@@ -37,7 +37,7 @@ Does not cover:
 A single `.docx` file (Office Open XML, ISO/IEC 29500) containing a
 legal brief with citations in the body.
 
-That is the entire required input. toatool does not require:
+That is the entire required input. citetab does not require:
 
 - A rendered PDF (we render the document ourselves; see Section 3)
 - Authoring conventions, special styles, or marker comments
@@ -52,7 +52,7 @@ uses; requiring compliance with conventions would break the core
 promise ("works like Word's table of contents — it just updates").
 
 Malformed or unreadable input fails loudly with a clear message naming
-the file and the failure. toatool never partially processes a brief it
+the file and the failure. citetab never partially processes a brief it
 cannot fully parse.
 
 ### 2.3 Court profile selection
@@ -74,7 +74,7 @@ names ("table of cited authorities"); the Ninth Circuit shell brief
 uses the exact heading `TABLE OF AUTHORITIES`. Trial-court practice is
 less uniform — some districts require a TOA only above a length
 threshold (e.g., N.D. Cal., briefs over 10 pages), and real motion
-memoranda sometimes carry no TOA section at all. Since toatool's
+memoranda sometimes carry no TOA section at all. Since citetab's
 audience includes heavy trial-court practice, heading detection alone
 is insufficient. v1 therefore supports two mechanisms.
 
@@ -92,7 +92,7 @@ is insufficient. v1 therefore supports two mechanisms.
    Authorities", "Table of Cited Authorities"). The variant list is
    data, not hardcoded. The replacement region is everything below the
    matched heading up to the next heading of the same or higher level.
-4. **Fallback (nothing found).** toatool does NOT guess an insertion
+4. **Fallback (nothing found).** citetab does NOT guess an insertion
    point. The TOA is emitted in the Markdown report only, the
    regenerated .docx is not written, and a finding explains why and how
    to fix it (add the heading, or drop a `[[TOA]]` marker). Silent
@@ -106,12 +106,12 @@ TOA, so any such heuristic would be brittle.
 **Marker-to-heading handoff (idempotency).** The generated TOA always
 carries the standard "Table of Authorities" heading. A marker therefore
 bootstraps placement exactly once; every subsequent run detects the
-section via the heading path. Re-runs on toatool's own output need no
+section via the heading path. Re-runs on citetab's own output need no
 marker.
 
 **Conflict handling.** If both a marker and a detectable heading region
 are present, the marker wins and a warning-level finding identifies the
-unmodified heading region. toatool never silently deletes content.
+unmodified heading region. citetab never silently deletes content.
 
 ---
 
@@ -154,7 +154,7 @@ layout of the actual document, not an approximation.
 Roman, etc.) are absent, LibreOffice substitutes metric-compatible
 fonts (Liberation Serif, Carlito). Page breaks can differ from Word's
 by ±1 page at the margins. When substitution occurs during a run,
-toatool emits an info-level finding disclosing it and recommending font
+citetab emits an info-level finding disclosing it and recommending font
 installation. The risk is disclosed, never silent.
 
 ### 3.2 The regeneration loop (fixed-point pagination)
@@ -178,7 +178,7 @@ Convergence is fast in practice: after step 2, iterations only change
 page-number digits (and occasionally a passim flip), which rarely
 changes line counts.
 
-**Iteration cap:** 5. If pagination has not stabilized, toatool writes
+**Iteration cap:** 5. If pagination has not stabilized, citetab writes
 the outputs with the last computed numbers plus a prominent error-level
 finding identifying the unstable entries. It never loops indefinitely
 and never pretends convergence.
@@ -199,7 +199,7 @@ and the next pass absorbs.
 
 ### 3.3 Idempotency promise
 
-Same input → same output, every run. Running toatool on its own output
+Same input → same output, every run. Running citetab on its own output
 must converge immediately with zero changes; this doubles as a built-in
 self-test and is the direct answer to Best Authority's re-run
 fragility, which is the core user pain (Cheryle).
@@ -294,7 +294,7 @@ TOA's provenance explainable after the fact.
 
 These constrain everything above and all subsequent steps:
 
-1. toatool **generates** a TOA. Findings are secondary to generation.
+1. citetab **generates** a TOA. Findings are secondary to generation.
 2. Deterministic before AI: no LLM calls at generation time in v1.
 3. Local-first: no network calls during a run, no telemetry.
 4. Specification before implementation: this document, the court

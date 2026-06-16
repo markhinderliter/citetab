@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from toatool.engine.profile_loader import load_profile_by_id
-from toatool.pipeline import input_toa_diff, placement
+from citetab.engine.profile_loader import load_profile_by_id
+from citetab.pipeline import input_toa_diff, placement
 
 VARIANTS = ["Table of Authorities", "Table of Cited Authorities"]
 _CARMODY = "Carmody v. Westfall Transit Auth., 512 F.3d 1042 (9th Cir. 2018)"

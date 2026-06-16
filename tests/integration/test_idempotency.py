@@ -1,4 +1,4 @@
-"""Idempotency: running toatool on its own output changes nothing (FR-12, §3.3).
+"""Idempotency: running citetab on its own output changes nothing (FR-12, §3.3).
 
 For every .docx-producing fixture, a second run on the first run's output must
 converge in a single iteration and regenerate a byte-identical Table of
@@ -14,11 +14,11 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine.profile_loader import CourtProfile, load_profile_by_id
-from toatool.engine.runner import run_rules
-from toatool.pipeline import convergence
-from toatool.pipeline.convergence import GenerationResult
-from toatool.report import render_report
+from citetab.engine.profile_loader import CourtProfile, load_profile_by_id
+from citetab.engine.runner import run_rules
+from citetab.pipeline import convergence
+from citetab.pipeline.convergence import GenerationResult
+from citetab.report import render_report
 
 BRIEFS = Path(__file__).resolve().parent.parent.parent / "examples" / "briefs"
 

@@ -16,7 +16,7 @@ import pytest
 from jsonschema import Draft202012Validator
 from pydantic import ValidationError
 
-from toatool.models.registry import (
+from citetab.models.registry import (
     Authority,
     CitationRegistry,
     Occurrence,

@@ -1,6 +1,6 @@
-# Contributing to toatool
+# Contributing to citetab
 
-Thanks for your interest. toatool is a small, disciplined project; the
+Thanks for your interest. citetab is a small, disciplined project; the
 discipline is most of what makes it trustworthy. Contributions that
 respect the constraints below are very welcome.
 

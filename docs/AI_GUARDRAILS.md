@@ -1,6 +1,6 @@
-# AI Guardrails for toatool Development
+# AI Guardrails for citetab Development
 
-toatool is built primarily with AI-assisted coding tools (Claude Code,
+citetab is built primarily with AI-assisted coding tools (Claude Code,
 Codex, and similar). This document codifies the constraints those tools
 must follow. It exists because AI coding tools are productive but, left
 unsupervised, will wander away from the project's architectural
@@ -57,7 +57,7 @@ realistic-looking documents that collide with real matters; do not.
 
 ### 5. Generator framing is structural
 
-toatool *generates* a table. Findings are disclosures around that table —
+citetab *generates* a table. Findings are disclosures around that table —
 what was corrected, what to verify — never legal judgments. Every finding's
 severity must answer the question "what must the user do before filing?"
 
@@ -125,7 +125,7 @@ Deviating from these requires a clear justification in the PR description.
 - The §20 test oracle in `docs/PRD.md` is reproduced exactly. CI runs under
   LibreOffice with Liberation substitution, so **TT-008 (warning, high) is
   expected present on every fixture run in CI**.
-- Idempotency is a test, not just a promise: running toatool on its own
+- Idempotency is a test, not just a promise: running citetab on its own
   output must converge immediately with no changes.
 
 ### Dependencies
@@ -169,7 +169,7 @@ one.
 
 ## Why these guardrails exist
 
-toatool produces an artifact that goes into court filings, where mistakes
+citetab produces an artifact that goes into court filings, where mistakes
 have professional consequences. Compliance-adjacent and filing-adjacent
 software has well-documented failure modes when shipping is prioritized
 over correctness:
@@ -183,5 +183,5 @@ over correctness:
 - Tools that send documents over the network in a confidentiality-sensitive
   domain create new exposure for their users.
 
-These guardrails are the structural commitments that keep toatool out of
+These guardrails are the structural commitments that keep citetab out of
 those failure modes.

@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from toatool.engine.rule_loader import (
+from citetab.engine.rule_loader import (
     RuleCard,
     RuleLoaderError,
     active_rule_ids,

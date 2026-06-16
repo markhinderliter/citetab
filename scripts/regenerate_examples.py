@@ -19,10 +19,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from toatool.engine.profile_loader import load_profile_by_id
-from toatool.engine.runner import run_rules
-from toatool.pipeline import convergence
-from toatool.report import render_report
+from citetab.engine.profile_loader import load_profile_by_id
+from citetab.engine.runner import run_rules
+from citetab.pipeline import convergence
+from citetab.report import render_report
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 BRIEFS = REPO_ROOT / "examples" / "briefs"
