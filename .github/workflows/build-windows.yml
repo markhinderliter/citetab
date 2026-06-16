@@ -1,0 +1,50 @@
+# .github/workflows/build-windows.yml
+#
+# Builds the citetab Windows onedir bundle on a GitHub-hosted Windows runner
+# (PyInstaller can't cross-compile, so this is how we get a real .exe without
+# owning a Windows build machine). Produces a downloadable artifact you then
+# double-click-test on a real Windows box.
+
+name: Build Windows app
+
+# Manual trigger only: build when you actually want a Windows artifact, not on
+# every commit. Keeps Actions-minute usage near zero.
+#
+# NOTE: the "Run workflow" button only appears once this file exists on your
+# repository's DEFAULT branch. See the explanation in chat for how to handle
+# that while the freeze work is still on feature/desktop-app.
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"   # matches the interpreter the freeze was proven on
+
+      - name: Install citetab and PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install .
+          pip install pyinstaller==6.21.0   # pinned to the version used for the Linux proof-build
+
+      - name: Build the onedir bundle
+        run: pyinstaller freeze/citetab.spec
+        # Produces dist/citetab/ — the same spec validated on Linux; on Windows
+        # PyInstaller picks up the Windows Tcl/Tk, .pyd extensions, etc. automatically.
+
+      - name: Upload the Windows build as a downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: citetab-windows-onedir
+          path: dist/citetab/
+          retention-days: 14
+        # Download this zip from the run's summary page, extract it on your
+        # Windows box, and run citetab.exe to test.
