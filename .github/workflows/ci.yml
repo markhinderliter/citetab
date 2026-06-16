@@ -1,9 +1,14 @@
 name: ci
 
-# The single quality gate: CI runs exactly what a contributor runs locally
-# (scripts/check.sh = ruff + ruff format --check + mypy --strict + pytest/coverage).
-# LibreOffice is installed so the render-backed integration tests actually
-# exercise rather than skip.
+# The single quality gate: CI runs scripts/check.sh
+# (ruff + ruff format --check + mypy --strict + pytest/coverage) — the same
+# script a contributor runs locally, with one deliberate difference: tests
+# marked @pytest.mark.calibrated are deselected here. They assert specific
+# measured page numbers / pagination-derived finding sets that only hold on the
+# fixture-generating machine; a stock runner's LibreOffice + fonts paginate
+# differently, so those run LOCALLY ONLY (the conftest hook keys on the CI env
+# var, which GitHub Actions sets automatically). LibreOffice is still installed
+# so the portable (environment-independent) render-backed tests still exercise.
 
 on:
   push:

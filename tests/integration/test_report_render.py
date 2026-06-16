@@ -83,6 +83,7 @@ def test_tt001_authority_line_lists_all_card_citations(frap: CourtProfile) -> No
 
 
 @_NEEDS_RENDER
+@pytest.mark.calibrated
 def test_tt008_discloses_real_substitution_pair(frap: CourtProfile) -> None:
     """TT-008 names the real Consolas→DejaVu pair, not the old Times→Liberation."""
     report = _render(
@@ -94,6 +95,7 @@ def test_tt008_discloses_real_substitution_pair(frap: CourtProfile) -> None:
 
 
 @_NEEDS_RENDER
+@pytest.mark.calibrated
 def test_no_findings_and_fonts_ok_without_substitution(
     frap: CourtProfile, monkeypatch: pytest.MonkeyPatch
 ) -> None:

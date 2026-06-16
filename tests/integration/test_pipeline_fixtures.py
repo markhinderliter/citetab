@@ -65,6 +65,7 @@ def _all_occurrence_pages_set(result: convergence.GenerationResult) -> bool:
     )
 
 
+@pytest.mark.calibrated
 def test_clean_converges_on_first_check(clean: convergence.GenerationResult) -> None:
     """The clean brief converges, in a single iteration."""
     assert clean.converged is True
@@ -76,6 +77,7 @@ def test_clean_placement_is_heading(clean: convergence.GenerationResult) -> None
     assert clean.placement.mechanism == "heading"
 
 
+@pytest.mark.calibrated
 def test_clean_carmody_is_page_list_not_passim(
     clean: convergence.GenerationResult, frap: CourtProfile
 ) -> None:
@@ -99,11 +101,13 @@ def test_clean_includes_jurisdiction_statutes_and_rule(
     assert "rule:fedrappp:28" in ids
 
 
+@pytest.mark.calibrated
 def test_clean_registry_pages_all_present(clean: convergence.GenerationResult) -> None:
     """The frozen registry has a measured page for every occurrence."""
     assert _all_occurrence_pages_set(clean) is True
 
 
+@pytest.mark.calibrated
 def test_clean_input_toa_matches_registry(
     clean: convergence.GenerationResult, frap: CourtProfile
 ) -> None:
@@ -158,6 +162,7 @@ def test_dirty_has_statute_via_recognizer(dirty: convergence.GenerationResult) -
     assert "statute:usc:15:1692e" in _authority_ids(dirty)
 
 
+@pytest.mark.calibrated
 def test_dirty_carmody_renders_passim(
     dirty: convergence.GenerationResult, frap: CourtProfile
 ) -> None:
@@ -174,6 +179,7 @@ def test_dirty_carmody_renders_passim(
     assert toa_builder.page_text(carmody, frap) == frap.passim.render_text
 
 
+@pytest.mark.calibrated
 def test_dirty_delgado_is_page_list(
     dirty: convergence.GenerationResult, frap: CourtProfile
 ) -> None:

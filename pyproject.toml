@@ -127,6 +127,13 @@ follow_imports = "skip"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--cov=citetab --cov-report=term-missing --cov-fail-under=85"
+markers = [
+  # Calibration-dependent: asserts specific measured page numbers or finding sets
+  # that depend on exact pagination (LibreOffice version + installed fonts). Valid
+  # only on the fixture-generating machine; skipped automatically when CI is set
+  # (see tests/conftest.py). Run them locally — they are the real verification.
+  "calibrated: render-backed test whose result depends on the local render calibration",
+]
 
 [tool.coverage.run]
 source = ["src/citetab"]

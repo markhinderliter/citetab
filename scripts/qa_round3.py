@@ -326,28 +326,61 @@ CASES: tuple[Case, ...] = (
     # Valid prose without citations/TOA: degrades to TT-005 (exit 1), not exit 2.
     Case("C1-j", "Valid .docx, prose, no citations/TOA", "degrade", build_non_brief),
     # Category 2 — degrade (graceful on hard but valid input).
-    Case("C2-a", "Pincite split across a page boundary (H1)", "degrade",
-         build_c2a_boundary_split),
-    Case("C2-b", "Footnote citations", "degrade", lambda _: None,
-         "python-docx cannot author Word footnotes; needs raw-XML fixture or a "
-         "real footnoted brief — deferred to a manual/real-document pass."),
+    Case(
+        "C2-a",
+        "Pincite split across a page boundary (H1)",
+        "degrade",
+        build_c2a_boundary_split,
+    ),
+    Case(
+        "C2-b",
+        "Footnote citations",
+        "degrade",
+        lambda _: None,
+        "python-docx cannot author Word footnotes; needs raw-XML fixture or a "
+        "real footnoted brief — deferred to a manual/real-document pass.",
+    ),
     Case("C2-c", "Citation only in a table cell", "degrade", build_table_citation),
-    Case("C2-d", "Large brief, multi-page TOA (40+ authorities)", "degrade",
-         build_large_toa),
+    Case(
+        "C2-d",
+        "Large brief, multi-page TOA (40+ authorities)",
+        "degrade",
+        build_large_toa,
+    ),
     Case("C2-e", "Passim-heavy authority", "degrade", build_passim_heavy),
-    Case("C2-f", "Page-number restart (roman→arabic)", "degrade", lambda _: None,
-         "section page-numbering restarts are low-fidelity via python-docx; "
-         "deferred to a real-document pass."),
-    Case("C2-g", "TOA heading in a non-canonical casing", "degrade",
-         build_heading_variant),
-    Case("C2-h", "eyecite-hard forms (id./supra/string)", "degrade",
-         build_eyecite_hard),
-    Case("C2-i", "Real public-domain brief", "degrade", lambda _: None,
-         "out of automated scope; manual real-document check (do not commit "
-         "third-party binaries)."),
-    Case("C2-j", "True non-convergence (oscillation)", "degrade", lambda _: None,
-         "impractical/non-deterministic to construct; loop logic is covered by "
-         "the mocked-measurer unit test test_tt007_convergence."),
+    Case(
+        "C2-f",
+        "Page-number restart (roman→arabic)",
+        "degrade",
+        lambda _: None,
+        "section page-numbering restarts are low-fidelity via python-docx; "
+        "deferred to a real-document pass.",
+    ),
+    Case(
+        "C2-g",
+        "TOA heading in a non-canonical casing",
+        "degrade",
+        build_heading_variant,
+    ),
+    Case(
+        "C2-h", "eyecite-hard forms (id./supra/string)", "degrade", build_eyecite_hard
+    ),
+    Case(
+        "C2-i",
+        "Real public-domain brief",
+        "degrade",
+        lambda _: None,
+        "out of automated scope; manual real-document check (do not commit "
+        "third-party binaries).",
+    ),
+    Case(
+        "C2-j",
+        "True non-convergence (oscillation)",
+        "degrade",
+        lambda _: None,
+        "impractical/non-deterministic to construct; loop logic is covered by "
+        "the mocked-measurer unit test test_tt007_convergence.",
+    ),
 )
 
 
@@ -371,9 +404,11 @@ def evaluate(case: Case, workdir: Path) -> CaseResult:
     run = run_cli(path)
     if run.has_traceback:
         return CaseResult(
-            case, "FAIL",
+            case,
+            "FAIL",
             f"traceback escaped to stderr (exit {run.exit_code})",
-            run.stderr_tail, run.files_written,
+            run.stderr_tail,
+            run.files_written,
         )
 
     if case.mode == "reject":
@@ -437,7 +472,7 @@ def write_results(results: list[CaseResult]) -> None:
         "",
         "Note: an encrypted `.docx` and a legacy `.doc` are both OLE2 compound "
         "files on disk, so the tool rejects them with the same generic "
-        "\"not a readable .docx\" message — honest and human, but it cannot "
+        '"not a readable .docx" message — honest and human, but it cannot '
         "single out *encryption* as the cause without sniffing the OLE2 magic. "
         "A more specific hint is a possible (cosmetic) enhancement, not a "
         "robustness gap.",
