@@ -131,6 +131,22 @@ def render_engine_info() -> tuple[str, str]:
     return "LibreOffice", match.group(1) if match else "unknown"
 
 
+def _user_installation_uri(profile_dir: Path) -> str:
+    r"""Return ``profile_dir`` as a ``file://`` URI for ``-env:UserInstallation``.
+
+    LibreOffice requires this argument to be a URL, not a native path. A bare
+    ``file://`` + path interpolation only works on POSIX by accident (the leading
+    ``/`` supplies the third slash); on Windows it yields ``file://C:\…`` —
+    ``C:`` read as the authority, backslashes invalid — which LibreOffice
+    misreports as "bootstrap.ini is corrupt". :meth:`~pathlib.Path.as_uri` emits
+    the correct RFC 8089 form on both platforms (``file:///C:/…`` on Windows,
+    ``file:///…`` on POSIX, byte-identical to the legacy string there) and
+    percent-encodes spaces. ``resolve()`` satisfies ``as_uri()``'s requirement of
+    an absolute path.
+    """
+    return profile_dir.resolve().as_uri()
+
+
 def render_to_pdf(docx_path: Path, out_dir: Path) -> Path:
     """Render a ``.docx`` to PDF in ``out_dir`` and return the PDF path.
 
@@ -151,7 +167,7 @@ def render_to_pdf(docx_path: Path, out_dir: Path) -> Path:
         "--headless",
         "--norestore",
         "--nolockcheck",
-        f"-env:UserInstallation=file://{profile_dir}",
+        f"-env:UserInstallation={_user_installation_uri(profile_dir)}",
         "--convert-to",
         "pdf",
         "--outdir",
