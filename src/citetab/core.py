@@ -25,7 +25,7 @@ from citetab.engine.profile_loader import (
     load_profile_by_id,
 )
 from citetab.engine.runner import RuleRunResult, run_rules
-from citetab.pipeline import convergence
+from citetab.pipeline import convergence, renderer
 from citetab.pipeline.convergence import GenerationResult
 from citetab.pipeline.extractor import EmptyDocumentError
 from citetab.pipeline.parser import ParserError
@@ -108,7 +108,14 @@ def _write_outputs(
 
 
 def _failure(message: str) -> GenerationOutcome:
-    """Build a FAILED outcome (exit 2) that claims no files."""
+    """Build a FAILED outcome (exit 2) for an unprocessable *input*.
+
+    The message is framed around the file because the cause is the input itself
+    (an unreadable/non-``.docx`` brief, an unknown profile, a parse failure, or a
+    render that errored on this document). For a missing render *dependency* —
+    which is an environment problem, not a bad file — use
+    :func:`_dependency_failure` instead so the user is not told their brief is bad.
+    """
     return GenerationOutcome(
         outcome=Outcome.FAILED,
         exit_code=Outcome.FAILED.value,
@@ -119,6 +126,29 @@ def _failure(message: str) -> GenerationOutcome:
         warning_count=0,
         info_count=0,
         message=f"Couldn't process that file:\n\n{message}",
+        error=message,
+    )
+
+
+def _dependency_failure(message: str) -> GenerationOutcome:
+    """Build a FAILED outcome (exit 2) for a missing/misconfigured render dependency.
+
+    Distinct from :func:`_failure` only in framing: LibreOffice being absent is an
+    *environment* problem, so the user-facing ``message`` surfaces the install
+    instructions verbatim and must NOT prepend "Couldn't process that file" — the
+    input brief is not at fault. The ``find_libreoffice`` message already names the
+    download URL and the ``CITETAB_LIBREOFFICE`` override, so it is used as-is.
+    """
+    return GenerationOutcome(
+        outcome=Outcome.FAILED,
+        exit_code=Outcome.FAILED.value,
+        output_dir=None,
+        docx_path=None,
+        report_path=None,
+        error_count=0,
+        warning_count=0,
+        info_count=0,
+        message=message,
         error=message,
     )
 
@@ -202,7 +232,23 @@ def run_generation(
 
     try:
         gen = convergence.generate(input_path, profile, toa_heading=toa_heading)
-    except (ParserError, RenderError, EmptyDocumentError) as exc:
+    except (ParserError, EmptyDocumentError) as exc:
+        # A bad or empty input is the user's file problem. Report it as such even
+        # when LibreOffice is also absent — these checks run before any render, so
+        # the file error is surfaced first, rather than sending the user to install
+        # a large dependency only to discover the file was the real problem.
+        return _failure(str(exc))
+    except RenderError as exc:
+        # The render step raised. Distinguish a missing render dependency from a
+        # genuine render failure on this document — without a dedicated exception
+        # type — by re-probing discovery. If LibreOffice still cannot be located,
+        # it is absent/misconfigured (caught before any real render was attempted),
+        # so it gets the environment-framed message; otherwise LibreOffice is
+        # present but failed to render this document, which is a file problem.
+        try:
+            renderer.find_libreoffice()
+        except RenderError:
+            return _dependency_failure(str(exc))
         return _failure(str(exc))
 
     rules = run_rules(gen, input_path=input_path, profile=profile)
