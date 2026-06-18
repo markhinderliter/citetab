@@ -46,5 +46,31 @@ jobs:
           name: citetab-windows-onedir
           path: dist/citetab/
           retention-days: 14
-        # Download this zip from the run's summary page, extract it on your
-        # Windows box, and run citetab.exe to test.
+        # The onedir is kept as a debugging artifact (extract + run citetab.exe
+        # directly, no install). The setup.exe below is the actual deliverable.
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+        # Chocolatey is preinstalled on windows-latest. Installing Inno explicitly
+        # (rather than relying on the runner image happening to ship it) pins the
+        # installer toolchain. ISCC.exe lands at the standard Program Files (x86)
+        # path used in the next step.
+
+      - name: Build the Windows installer (setup.exe)
+        shell: pwsh
+        run: |
+          $ver = (python -c "import citetab, sys; sys.stdout.write(citetab.__version__)")
+          Write-Host "Packaging citetab $ver"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=$ver freeze\citetab.iss
+        # Sources the version from the installed package (single source of truth),
+        # injects it into the .iss, and compiles dist\citetab\ (built above) into
+        # dist\installer\citetab-setup.exe. UNSIGNED (signing deferred).
+
+      - name: Upload the installer as a downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: citetab-windows-installer
+          path: dist/installer/citetab-setup.exe
+          retention-days: 14
+        # The deliverable: download, run on Windows, install, launch from the
+        # Start menu. UNSIGNED — SmartScreen will warn until code signing lands.
