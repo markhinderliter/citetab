@@ -263,3 +263,44 @@ to enable this.
 **Note:** the three parts are sequenced by dependency, not severity; the
 per-profile research/validation cost (not the code) dominates, and grows sharply
 from the federal tier to the state tier.
+
+**Placeholder state & cleanup guard (v1):** with FRAP as the only profile, the
+GUI applies FRAP and **discloses** it, but shows **no picker** (a one-item chooser
+is pointless) and uses a **silent FRAP default**. This is correct *only* while one
+profile exists. The moment a second profile lands, the silent default becomes a
+wrong-court hazard — so the picker (part 2) and the removal of the silent default
+(part 3) are **coupled to adding the second profile** and must ship together (see
+the dependency order above). Do **not** delete picker/profile-related scaffolding
+during cleanup on the grounds that "there's no picker yet" — it is load-bearing
+for this gated work.
+
+---
+
+### BL-6 — Render report shows "LibreOffice unknown" on Windows
+
+**Type:** disclosure gap (cosmetic — render works correctly)
+**Found during:** end-to-end Windows VM testing of the v0.5 frozen build
+**Severity:** cosmetic / disclosure gap (not functional)
+**Status:** open, low priority.
+
+On Windows the findings report's render line reads
+`render: LibreOffice unknown headless`, where Linux correctly shows the version
+string (e.g. `render: LibreOffice 24.2.7.2 headless`). The render itself
+succeeds and the TOA is correct; only the version disclosure is missing.
+
+**Likely cause:** `render_engine_info()` (`src/citetab/pipeline/renderer.py`) —
+the secondary LibreOffice call that retrieves the version string — doesn't
+parse/return the version on Windows the way it does on Linux. Same **family** as
+the `UserInstallation` URI bug (a Windows-specific quirk in how LibreOffice is
+invoked/parsed), though a separate code path.
+
+**Why it matters:** this is a legal tool; the report disclosing exactly which
+render engine/version produced the page numbers is part of its trustworthiness.
+`unknown` is an incomplete disclosure on Windows.
+
+**Verification note:** like the URI fix, any fix is **Windows-only** and **not**
+confirmable by a green Linux run — it requires a rebuild via the `build-windows`
+Actions workflow plus a retest in the Windows VM.
+
+**Defer rationale:** cosmetic, doesn't block function; bundle with other
+Windows-polish work rather than chasing its own slow VM-verify loop now.
