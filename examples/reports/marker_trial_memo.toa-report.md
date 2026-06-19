@@ -1,6 +1,6 @@
 # citetab report — marker_trial_memo.docx
 
-- engine 0.1.0 · rule pack toa 1.1.0 · profile frap 1.0.0
+- engine 0.5.0 · rule pack toa 1.1.0 · profile frap 1.0.0
 - input: marker_trial_memo.docx (sha256 62f79748ca99…)
 - render: LibreOffice 24.2.7.2 headless · fonts substituted (Consolas → DejaVu Sans Mono)
 - placement: [[TOA]] marker, consumed

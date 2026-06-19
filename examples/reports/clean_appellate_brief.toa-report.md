@@ -1,6 +1,6 @@
 # citetab report — clean_appellate_brief.docx
 
-- engine 0.1.0 · rule pack toa 1.1.0 · profile frap 1.0.0
+- engine 0.5.0 · rule pack toa 1.1.0 · profile frap 1.0.0
 - input: clean_appellate_brief.docx (sha256 96346125243f…)
 - render: LibreOffice 24.2.7.2 headless · fonts substituted (Consolas → DejaVu Sans Mono)
 - placement: heading "TABLE OF AUTHORITIES"

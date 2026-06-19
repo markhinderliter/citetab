@@ -101,6 +101,6 @@ release.
 
 ## Effective date
 
-This document is current as of citetab engine v0.1.0, rule pack v1.0.0,
+This document is current as of citetab engine v0.5.0, rule pack v1.0.0,
 and the frap profile v1.0.0. If you are reading it in a later version,
 check the CHANGELOG for any material change to positioning.

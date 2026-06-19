@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "citetab"
-version = "0.1.0"
+version = "0.5.0"
 description = "Free, local-first Table of Authorities generator for legal briefs. Citations parsed with eyecite; page numbers measured from a real LibreOffice render. Drafts for attorney review — not legal advice."
 readme = "README.md"
 requires-python = ">=3.11"

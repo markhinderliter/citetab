@@ -14,7 +14,7 @@
 ;
 ; NOT verifiable on Linux. Inno Setup is Windows-only; compile with iscc on
 ; Windows (CI does this on windows-latest). Build locally from the repo root:
-;   iscc /DMyAppVersion=0.1.0 freeze\citetab.iss
+;   iscc /DMyAppVersion=0.5.0 freeze\citetab.iss
 ; CI injects the real version from the installed package; the default below only
 ; lets the script compile standalone.
 

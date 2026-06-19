@@ -66,3 +66,38 @@ heading variant); **patch** = documentation and clarity only.
 - The project name is a placeholder; the real name is decided at the
   v0.5 launch. Expect a rename release with import and CLI aliases
   noted here.
+
+## [0.5.0] — 2026-06-19
+
+First public release. citetab is now a double-click **Windows app**, not only a
+command-line tool — aimed at the paralegal/solo-practitioner user who shouldn't
+need a terminal.
+
+### Added
+
+- **Windows installer.** An (unsigned) `citetab-setup.exe`, built by the
+  `build-windows` workflow, installs citetab like a normal Windows program with a
+  Start-menu shortcut and an uninstaller. Setup shows the LibreOffice prerequisite
+  — it informs only; it never downloads or installs anything for you. (Unsigned
+  for now, so Windows SmartScreen warns on first run; code signing is deferred.)
+- **In-app file picker (GUI).** Launching citetab with no file opens a
+  "choose a `.docx`" dialog and reports the result in a message box: where the new
+  files are, the court format applied, and anything to review. No terminal needed.
+- **Human-readable court profile.** The CLI and GUI now disclose the applied
+  format as "Court profile: Federal Appellate (FRAP)" rather than "frap (v1.0.0)".
+
+### Changed
+
+- **Graceful missing-LibreOffice handling.** If LibreOffice isn't installed,
+  citetab now fails with a clear, instructive message (install it from
+  libreoffice.org) and a clean exit instead of a crash or stack trace — and a
+  bad/empty input still reports its own problem first, even when LibreOffice is
+  also absent.
+
+### Fixed
+
+- **Windows render crash.** On Windows the LibreOffice version probe
+  (`soffice.exe --version`) could hang ~60 seconds and crash the entire run before
+  rendering. The probe now degrades gracefully on any failure and uses the console
+  `soffice.com` so it returns the real version quickly; generation completes and
+  the report shows the actual LibreOffice version instead of "unknown".
