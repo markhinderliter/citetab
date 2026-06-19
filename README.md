@@ -185,10 +185,17 @@ and anyone who wants to script it can run it.
 
 ### Install
 
+citetab isn't published to PyPI yet, so install it from source:
+
 ```bash
 # Requires Python 3.11+ and LibreOffice (see System requirements below)
-pip install citetab
+git clone https://github.com/markhinderliter/citetab.git
+cd citetab
+pip install .
 ```
+
+This installs the `citetab` command. (A PyPI package — `pip install citetab` —
+is planned for a future release.)
 
 ### Use
 
