@@ -21,9 +21,12 @@ import subprocess
 import sys
 import zipfile
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 _RENDER_TIMEOUT_S = 120
+#: Timeout for the cosmetic ``--version`` probe. On failure (timeout or otherwise)
+#: ``render_engine_info`` degrades to "unknown" rather than aborting the run.
+_VERSION_TIMEOUT_S = 60
 _FONT_ATTR_RE = re.compile(r'w:(?:ascii|hAnsi|cs)="([^"]+)"')
 
 #: Environment variable holding an explicit path to the LibreOffice executable.
@@ -118,15 +121,66 @@ def find_libreoffice() -> str:
     )
 
 
+def _soffice_com_sibling(executable: str) -> str | None:
+    r"""Return the ``soffice.com`` path beside a ``soffice.exe``, else ``None``.
+
+    Pure path computation — no filesystem access and no platform check, so it is
+    testable on any OS. Parsed as a Windows path, ``…\soffice.exe`` (any case)
+    yields its ``…\soffice.com`` sibling; anything else (POSIX ``soffice`` /
+    ``libreoffice`` binaries, or a non-soffice name) yields ``None``. Only Windows
+    discovery ever produces a ``soffice.exe`` name, so the shape of the path —
+    not a platform flag — is what gates this.
+    """
+    win = PureWindowsPath(executable)
+    if win.name.lower() == "soffice.exe":
+        return str(win.with_name("soffice.com"))
+    return None
+
+
+def _version_query_executable(executable: str) -> str:
+    """Return the executable to use for the ``--version`` query.
+
+    On Windows the discovered ``soffice.exe`` is the GUI launcher: queried with
+    ``--version`` it neither writes to the captured pipe nor exits, so the call
+    hangs to the timeout. Its console sibling ``soffice.com`` (same directory)
+    emits the version and exits, so it is preferred *for this query only* when it
+    exists. On POSIX (and if no sibling is present) the discovered executable is
+    used unchanged. The render path is unaffected — it keeps the discovered
+    executable.
+    """
+    sibling = _soffice_com_sibling(executable)
+    if sibling is not None and Path(sibling).exists():
+        return sibling
+    return executable
+
+
 def render_engine_info() -> tuple[str, str]:
-    """Return the render engine identity and version (``("LibreOffice", "24.2…")``)."""
-    executable = find_libreoffice()
-    result = subprocess.run(  # noqa: S603 - fixed executable, no shell
-        [executable, "--version"],
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
+    """Return the render engine identity and version (``("LibreOffice", "24.2…")``).
+
+    Version detection is provenance only — it stamps the report header and the
+    CLI/GUI disclosures — so it must never abort generation. On any failure to
+    *query* (timeout, missing/again-unusable executable, OS error) or *parse* the
+    version, it degrades to ``("LibreOffice", "unknown")``. This deliberately
+    differs from :func:`render_to_pdf`, where a failure is a real error and is
+    raised: a failed render must error, a failed version check must not.
+
+    ``find_libreoffice`` is called outside the guard so a genuine *not-found*
+    still propagates as ``RenderError`` (the missing-dependency path), rather than
+    being masked as an "unknown" version.
+    """
+    executable = _version_query_executable(find_libreoffice())
+    try:
+        result = subprocess.run(  # noqa: S603 - fixed executable, no shell
+            [executable, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=_VERSION_TIMEOUT_S,
+        )
+    except (subprocess.TimeoutExpired, subprocess.CalledProcessError, OSError):
+        # FileNotFoundError is an OSError subclass. Version detection is cosmetic —
+        # degrade rather than crash the run (the Windows soffice.exe --version hang
+        # is the motivating case; Fix 2 above makes it return fast when .com exists).
+        return "LibreOffice", "unknown"
     match = re.search(r"LibreOffice\s+([0-9][0-9.]*)", result.stdout)
     return "LibreOffice", match.group(1) if match else "unknown"
 
