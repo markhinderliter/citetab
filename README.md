@@ -77,7 +77,9 @@ you LibreOffice is missing and point you back here.)
 
 ### Step 2 — Download and install citetab
 
-1. Download **`citetab-setup.exe`** (from the project's releases page).
+1. **[Download citetab-setup.exe](https://github.com/markhinderliter/citetab/releases/latest/download/citetab-setup.exe)**
+   — clicking this downloads the installer directly. (You may see it land
+   in your Downloads folder.)
 2. Double-click it to install. citetab installs like any normal Windows
    program and adds itself to your Start menu. During setup it will
    remind you about the LibreOffice requirement from Step 1.
