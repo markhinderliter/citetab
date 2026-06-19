@@ -276,12 +276,46 @@ for this gated work.
 
 ---
 
-### BL-6 — Render report shows "LibreOffice unknown" on Windows
+### BL-6 — Render report shows "LibreOffice unknown" on Windows — ✅ RESOLVED
+
+**Status:** ✅ **RESOLVED** in commit `c3a693a` (branch `feature/version-detect-windows`,
+merged to `main`). Retained here, not deleted: the "filed cosmetic, was actually a
+release-blocking crash" history is useful institutional memory.
+
+**Reclassified — cosmetic → functional / release-blocking.** This was filed as a
+cosmetic disclosure gap ("the version just shows unknown; render still works"). That
+was **wrong**. The same code path didn't merely mis-stamp the version — on Windows it
+**hung 60s and crashed the whole run**: `render_engine_info()` called
+`soffice.exe --version` with no guard, the Windows GUI launcher neither emits
+`--version` to the pipe nor exits, `subprocess.run` hit its timeout and raised
+`TimeoutExpired`, which `run_generation` does **not** catch (only
+`ParserError`/`EmptyDocumentError`/`RenderError`) → unhandled exception that killed
+the run **before the render even started**. Linux never hit this (its binary
+prints + exits), which is exactly why it looked cosmetic from a green Linux suite.
+
+**Fix (two parts, both in/around `render_engine_info`, `renderer.py`):**
+
+1. **The guard.** The `--version` subprocess is wrapped in
+   `try/except (TimeoutExpired, CalledProcessError, OSError)` and **degrades to
+   `("LibreOffice", "unknown")`** on any failure — version detection is provenance,
+   its failure must never abort generation. `find_libreoffice()` stays outside the
+   guard so a genuine not-found still raises `RenderError` (missing-dependency path
+   preserved, not masked as "unknown").
+2. **The `soffice.com` switch.** On Windows the version query prefers the console
+   sibling `soffice.com` (emits + exits) over the GUI `soffice.exe` (hangs), via a
+   pure `PureWindowsPath` path transform gated by an existence check.
+
+**VM-confirmed (real Windows):** the run completes (no crash) and the report now
+reads `render: LibreOffice 25.8.7.3 headless` — a real version, not `unknown`.
+
+---
+
+<details>
+<summary>Original entry (as filed — preserved for the record)</summary>
 
 **Type:** disclosure gap (cosmetic — render works correctly)
 **Found during:** end-to-end Windows VM testing of the v0.5 frozen build
 **Severity:** cosmetic / disclosure gap (not functional)
-**Status:** open, low priority.
 
 On Windows the findings report's render line reads
 `render: LibreOffice unknown headless`, where Linux correctly shows the version
@@ -304,3 +338,5 @@ Actions workflow plus a retest in the Windows VM.
 
 **Defer rationale:** cosmetic, doesn't block function; bundle with other
 Windows-polish work rather than chasing its own slow VM-verify loop now.
+
+</details>
