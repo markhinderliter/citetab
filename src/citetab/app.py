@@ -31,7 +31,7 @@ def _report_stdout(result: GenerationOutcome) -> int:
         return result.exit_code
 
     assert result.report_path is not None  # set on every non-FAILED outcome
-    print(f"profile: {result.profile_id} (v{result.profile_version})")
+    print(f"profile: {result.profile_name}")
     if result.docx_path is None:
         print("output: .docx SUPPRESSED (no placement found); report written")
     else:

@@ -69,7 +69,7 @@ def generate(
     assert result.report_path is not None
     # Disclose the applied court format up front (not just in the report file) —
     # a legal tool should surface which court profile it applied.
-    click.echo(f"profile: {result.profile_id} (v{result.profile_version})")
+    click.echo(f"profile: {result.profile_name}")
     if result.docx_path is None:
         click.echo("output: .docx SUPPRESSED (no placement found); report written")
     else:

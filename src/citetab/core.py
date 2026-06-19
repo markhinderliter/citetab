@@ -61,6 +61,7 @@ class GenerationOutcome:
     message: str
     profile_id: str | None = None
     profile_version: str | None = None
+    profile_name: str | None = None
     error: str | None = None
 
 
@@ -172,7 +173,7 @@ def _success_message(
         f"Findings: {rules.error_count} error · "
         f"{rules.warning_count} warning · {rules.info_count} info"
     )
-    applied = f"Applied court profile: {profile.id} (v{profile.version})"
+    applied = f"Court profile: {profile.name}"
     lines: list[str]
     if outcome is Outcome.SUCCESS:
         lines = ["Done. Your new files are in:", "", str(output_dir), ""]
@@ -285,4 +286,5 @@ def run_generation(
         message=message,
         profile_id=profile.id,
         profile_version=profile.version,
+        profile_name=profile.name,
     )

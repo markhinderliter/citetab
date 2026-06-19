@@ -104,6 +104,14 @@ class CourtProfile(BaseModel):
     id: str = Field(pattern=_PROFILE_ID)
     """Profile identifier (e.g. ``frap``); selected by ``--court``."""
 
+    name: str = Field(min_length=1)
+    """Short human-readable display label (e.g. ``Federal Appellate (FRAP)``).
+
+    Used in the user-facing CLI/GUI disclosures; the machine-traceable report
+    header keeps the precise ``id``/``version`` instead. Also the label the v1.1
+    court picker (BACKLOG BL-5) will present.
+    """
+
     version: str = Field(pattern=_SEMVER)
     """Semantic version of this profile (the court-profile SemVer track)."""
 

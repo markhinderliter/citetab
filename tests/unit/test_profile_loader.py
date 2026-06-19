@@ -24,6 +24,7 @@ def test_frap_profile_loads_with_expected_fields(frap_profile_path: Path) -> Non
     profile = load_profile(frap_profile_path)
     assert isinstance(profile, CourtProfile)
     assert profile.id == "frap"
+    assert profile.name == "Federal Appellate (FRAP)"
     assert profile.version == "1.0.0"
     assert profile.effective_date == date(2026, 6, 5)
     assert profile.passim.threshold_pages == 5

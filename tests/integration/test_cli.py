@@ -146,9 +146,10 @@ def test_generate_clean_exits_0(runner: CliRunner, tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert (tmp_path / "clean_appellate_brief.toa.docx").is_file()
     assert (tmp_path / "clean_appellate_brief.toa-report.md").is_file()
-    # The applied court profile is disclosed on stdout (not just the report file).
-    version = load_profile_by_id("frap").version
-    assert f"profile: frap (v{version})" in result.output
+    # The applied court profile is disclosed on stdout (not just the report file),
+    # now as the human-readable name sourced from the live profile.
+    name = load_profile_by_id("frap").name
+    assert f"profile: {name}" in result.output
 
 
 @_NEEDS_RENDER
@@ -178,8 +179,8 @@ def test_generate_no_placement_suppresses_docx_exits_1(
     assert result.exit_code == 1
     assert "SUPPRESSED" in result.output
     # The applied profile is disclosed even on the suppressed/issues path.
-    version = load_profile_by_id("frap").version
-    assert f"profile: frap (v{version})" in result.output
+    name = load_profile_by_id("frap").name
+    assert f"profile: {name}" in result.output
     report = memo_no_marker.with_name("memo_no_marker.toa-report.md")
     assert report.is_file()
     assert not memo_no_marker.with_name("memo_no_marker.toa.docx").exists()

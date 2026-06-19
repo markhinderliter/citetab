@@ -2,6 +2,7 @@
 # Profiles are versioned data, not code. The TOA generator reads this;
 # nothing about grouping, ordering, passim, or headings is hardcoded.
 id: frap
+name: "Federal Appellate (FRAP)"
 version: 1.0.0
 effective_date: "2026-06-05"
 description: >

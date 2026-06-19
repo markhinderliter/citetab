@@ -38,5 +38,5 @@ def test_main_file_arg_clean_writes_files_and_discloses_profile(
     assert (tmp_path / "clean_appellate_brief.toa.docx").is_file()
     assert (tmp_path / "clean_appellate_brief.toa-report.md").is_file()
     out = capsys.readouterr().out
-    version = load_profile_by_id("frap").version
-    assert f"profile: frap (v{version})" in out
+    name = load_profile_by_id("frap").name
+    assert f"profile: {name}" in out
