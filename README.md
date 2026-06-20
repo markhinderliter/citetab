@@ -23,6 +23,17 @@ works, finally applied to authorities.
 
 ---
 
+## Website / Documentation
+
+- **Website & docs:** <https://markhinderliter.github.io/citetab/>
+  ([Getting started](https://markhinderliter.github.io/citetab/getting-started/) ·
+  [FAQ](https://markhinderliter.github.io/citetab/faq/) ·
+  [Comparison](https://markhinderliter.github.io/citetab/comparison/))
+- **Walkthrough video:** <https://youtu.be/CJgonPrqSo0>
+- **Download (Windows):** [citetab-setup.exe](https://github.com/markhinderliter/citetab/releases/latest/download/citetab-setup.exe)
+
+---
+
 ## What it does
 
 A Word brief (`.docx`) goes in; two files come out:

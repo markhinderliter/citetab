@@ -1,0 +1,43 @@
+# Jekyll configuration for the citetab GitHub Pages site.
+#
+# Pages source is this /docs folder (Settings → Pages → Deploy from a branch →
+# main → /docs). The site is self-contained: a custom layout in
+# _layouts/default.html, no remote theme and no plugins, so the build does not
+# depend on the GitHub Pages plugin allowlist.
+
+title: citetab
+tagline: Free, open-source Table of Authorities generator for legal briefs
+description: >-
+  citetab is a free, open-source tool that generates a draft Table of
+  Authorities from a Word (.docx) legal brief. It runs locally on your own
+  computer, never uploads your brief, and measures real page numbers from a
+  rendered document. It currently targets Federal Appellate (FRAP-style) briefs.
+
+# Project site lives at https://markhinderliter.github.io/citetab/
+url: https://markhinderliter.github.io
+baseurl: /citetab
+lang: en-US
+
+repo_url: https://github.com/markhinderliter/citetab
+download_url: https://github.com/markhinderliter/citetab/releases/latest/download/citetab-setup.exe
+video_url: https://youtu.be/CJgonPrqSo0
+video_id: CJgonPrqSo0
+
+# The developer/specification docs also live in /docs; keep them out of the
+# published site so only the landing/documentation pages are built.
+exclude:
+  - PRD.md
+  - ARCHITECTURE.md
+  - INPUT_OUTPUT_SPEC.md
+  - REPORT_SPEC.md
+  - AI_GUARDRAILS.md
+  - QA_ROUND2.md
+  - QA_ROUND2_RESULTS.md
+  - QA_ROUND3.md
+  - QA_ROUND3_RESULTS.md
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

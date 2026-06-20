@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://markhinderliter.github.io/citetab/sitemap.xml
