@@ -29,7 +29,7 @@ works, finally applied to authorities.
   ([Getting started](https://markhinderliter.github.io/citetab/getting-started/) ·
   [FAQ](https://markhinderliter.github.io/citetab/faq/) ·
   [Comparison](https://markhinderliter.github.io/citetab/comparison/))
-- **Walkthrough video:** <https://youtu.be/CJgonPrqSo0>
+- **Walkthrough video:** <https://youtu.be/z78v-9oHeNM>
 - **Download (Windows):** [citetab-setup.exe](https://github.com/markhinderliter/citetab/releases/latest/download/citetab-setup.exe)
 
 ---

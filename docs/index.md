@@ -30,10 +30,10 @@ permalink: /
   "@type": "VideoObject",
   "name": "citetab — a free, local Table of Authorities generator",
   "description": "A short walkthrough of citetab, a free and open-source tool that generates a draft Table of Authorities from a .docx legal brief, running locally on your own computer.",
-  "thumbnailUrl": "https://i.ytimg.com/vi/CJgonPrqSo0/hqdefault.jpg",
+  "thumbnailUrl": "https://i.ytimg.com/vi/z78v-9oHeNM/hqdefault.jpg",
   "uploadDate": "2026-06-19",
-  "contentUrl": "https://youtu.be/CJgonPrqSo0",
-  "embedUrl": "https://www.youtube.com/embed/CJgonPrqSo0"
+  "contentUrl": "https://youtu.be/z78v-9oHeNM",
+  "embedUrl": "https://www.youtube.com/embed/z78v-9oHeNM"
 }
 </script>
 
@@ -50,7 +50,7 @@ your brief, and is free and open source.</p>
 </div>
 
 <div class="video">
-  <iframe src="https://www.youtube.com/embed/CJgonPrqSo0"
+  <iframe src="https://www.youtube.com/embed/z78v-9oHeNM"
           title="citetab walkthrough"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen></iframe>

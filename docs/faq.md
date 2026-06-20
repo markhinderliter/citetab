@@ -133,6 +133,6 @@ public on [GitHub]({{ site.repo_url }}).
 
 ## Where can I see it in action?
 
-There is a short [walkthrough video](https://youtu.be/CJgonPrqSo0), and the
+There is a short [walkthrough video](https://youtu.be/z78v-9oHeNM), and the
 [Getting started]({{ '/getting-started/' | relative_url }}) page covers
 installation and a first run.
