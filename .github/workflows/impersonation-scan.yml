@@ -1,0 +1,24 @@
+# Opt-in monitoring: watch for repos impersonating citetab (the "repo confusion"
+# attack). Report-only for now — dry-run, read-only token, no issues are opened.
+# We flip to issue-opening only after watching clean runs.
+
+name: Impersonation scan
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 7 * * 1"   # weekly, Mondays 07:00 UTC
+
+permissions:
+  contents: read          # read-only; NO issues: write yet
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scan for impersonators of citetab
+        uses: markhinderliter/repo-impersonation-monitor@v0.1.0   # immutable release tag
+        with:
+          project-name: citetab
+          dry-run: true     # report-only
+          # project-repo defaults to ${{ github.repository }} = markhinderliter/citetab
